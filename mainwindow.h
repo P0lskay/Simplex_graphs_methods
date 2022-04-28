@@ -19,15 +19,14 @@ public:
 private slots:
     void on_variables_num_valueChanged(int arg1);
 
+    void on_restrictions_num_valueChanged(int arg1);
+
 private:
-    //Переменные хранящие кол-во ограничений, переменных, а также матрицу ограничений
+    //Переменные хранящие кол-во ограничений и переменных
     int restriction_num = 0;
     int variables_num = 0;
-    std::vector<std::vector<int>> restriction_matrix;
 
     Ui::MainWindow *ui;
 
-    //Метод для изменения матрицы ограничений
-    void change_restriction_matrix();
 };
 #endif // MAINWINDOW_H
