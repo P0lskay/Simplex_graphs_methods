@@ -16,7 +16,8 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-
+//При изменении кол-ва переменных или ограничений нужно поменять соответсвующие переменные и
+//Изменить кол-во строк/столбцов в таблице ввода
 void MainWindow::on_variables_num_valueChanged(int arg1)
 {
     if(arg1 != variables_num)
@@ -46,8 +47,6 @@ void MainWindow::on_variables_num_valueChanged(int arg1)
     }
 }
 
-
-
 void MainWindow::on_restrictions_num_valueChanged(int arg1)
 {
 
@@ -65,9 +64,30 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
     }
 }
 
-
-void MainWindow::on_pushButton_released()
+//При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
+void MainWindow::on_btn_send_into_data_released()
 {
+    QRegExp re("\\d*"); //Регулярное выражение для проверки на соответствие строки числу
 
+    for(int i = 0; i < variables_num+1; i++)
+    {
+        //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
+        if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
+            throw _exception();
+
+        main_task.push_back(ui->table_task_data->item(0, i)->text().toInt());
+    }
+
+    for(int i = 0; i < restriction_num; i++)
+    {
+        restrictions_matrix.push_back({});
+        for(int j = 0; j < variables_num+1; j++)
+        {
+            //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
+            if(!re.exactMatch(ui->table_restrictions_data->item(i, j)->text()))
+                throw _exception();
+            restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
+        }
+    }
 }
 

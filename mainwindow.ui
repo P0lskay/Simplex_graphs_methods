@@ -22,6 +22,11 @@
     <height>900</height>
    </size>
   </property>
+  <property name="font">
+   <font>
+    <family>Times New Roman</family>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
@@ -265,6 +270,25 @@
         <number>50</number>
        </attribute>
       </widget>
+     </widget>
+     <widget class="QPushButton" name="btn_send_into_data">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>580</y>
+        <width>171</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Получить решение</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tab">

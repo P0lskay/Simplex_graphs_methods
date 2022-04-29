@@ -17,15 +17,23 @@ public:
     ~MainWindow();
 
 private slots:
+    //При изменении кол-ва переменных или ограничений нужно поменять соответсвующие переменные и
+    //Изменить кол-во строк/столбцов в таблице ввода
     void on_variables_num_valueChanged(int arg1);
-
     void on_restrictions_num_valueChanged(int arg1);
+
+    //При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
+    void on_btn_send_into_data_released();
 
 private:
     //Переменные хранящие кол-во ограничений и переменных
     int restriction_num = 0;
     int variables_num = 0;
 
+    //Вектора, хранящие значения переменных для основной задачи и для ограничений соответсвенно
+    //Они будут отправляться в класс с симплекс методом и графическим методом
+    std::vector<int> main_task;
+    std::vector<std::vector<int>> restrictions_matrix;
     Ui::MainWindow *ui;
 
 };
