@@ -9,11 +9,15 @@ CONFIG += c++11
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    fractions.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    simplex.cpp
 
 HEADERS += \
-    mainwindow.h
+    fractions.h \
+    mainwindow.h \
+    simplex.h
 
 FORMS += \
     mainwindow.ui
