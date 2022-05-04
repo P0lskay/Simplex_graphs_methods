@@ -11,6 +11,7 @@ using namespace std;
 struct Simplex_matrix
 {
     explicit Simplex_matrix(vector<vector<int>>& matrix, bool comon_fractions = true);
+    explicit Simplex_matrix(vector<vector<Fractions>> matrix, bool comon_fractions = true);
     Fractions translate_int_to_Fractions(const int x, const int y = 1);
 
 public:
@@ -25,6 +26,7 @@ class Simplex
 {
     stack<Simplex_matrix> all_matrix;
     vector<Fractions> task_vec;
+    vector<int> free_var;
     bool min_task;
     bool common_fractions;
 public:

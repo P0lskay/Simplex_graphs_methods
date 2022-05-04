@@ -44,7 +44,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -301,7 +301,7 @@
         <x>0</x>
         <y>10</y>
         <width>1161</width>
-        <height>731</height>
+        <height>761</height>
        </rect>
       </property>
       <property name="currentIndex">
@@ -319,8 +319,8 @@
          <rect>
           <x>0</x>
           <y>0</y>
-          <width>1161</width>
-          <height>701</height>
+          <width>931</width>
+          <height>731</height>
          </rect>
         </property>
         <property name="showGrid">

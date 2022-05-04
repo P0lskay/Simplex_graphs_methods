@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include "simplex.h"
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -44,6 +45,17 @@ void MainWindow::on_variables_num_valueChanged(int arg1)
               ui->table_restrictions_data->setHorizontalHeaderItem(i ,new QTableWidgetItem(str));
          }
           ui->table_restrictions_data->setHorizontalHeaderItem(variables_num ,new QTableWidgetItem("A"));
+
+          for(int i = 0; i < variables_num+1; i++)
+          {
+                ui->table_task_data->setItem(0, i, new QTableWidgetItem("0"));
+          }
+
+          for(int i = 0; i < variables_num+1; i++)
+          {
+              for(int j = 0; j < restriction_num; j++)
+                ui->table_restrictions_data->setItem(j, i, new QTableWidgetItem("0"));
+          }
     }
 }
 
@@ -61,6 +73,17 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
             QString str = "f(x)" + QString::number(i+1);
              ui->table_restrictions_data->setVerticalHeaderItem(i ,new QTableWidgetItem(str));
         }
+
+        for(int i = 0; i < variables_num+1; i++)
+        {
+              ui->table_task_data->setItem(0, i, new QTableWidgetItem("0"));
+        }
+
+        for(int i = 0; i < variables_num+1; i++)
+        {
+            for(int j = 0; j < restriction_num; j++)
+              ui->table_restrictions_data->setItem(j, i, new QTableWidgetItem("0"));
+        }
     }
 }
 
@@ -73,7 +96,7 @@ void MainWindow::on_btn_send_into_data_released()
     {
         //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
         if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
-            throw _exception();
+            QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
 
         main_task.push_back(ui->table_task_data->item(0, i)->text().toInt());
     }
@@ -85,7 +108,7 @@ void MainWindow::on_btn_send_into_data_released()
         {
             //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
             if(!re.exactMatch(ui->table_restrictions_data->item(i, j)->text()))
-                throw _exception();
+                QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
             restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
         }
     }
