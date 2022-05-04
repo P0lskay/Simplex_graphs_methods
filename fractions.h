@@ -14,11 +14,20 @@ public:
 
     const pair<int, int> &getFraction() const;
     void setFraction(const pair<int, int> &newFraction);
+    //Метод отвечающий за упрощение дроби
+    void simpler_Fractions(Fractions& Fraction);
 
     Fractions operator +(Fractions& rhs);
     Fractions operator -(Fractions& rhs);
     Fractions operator *(Fractions& rhs);
+    Fractions operator /(Fractions& rhs);
+    bool operator ==(Fractions& rhs);
+    bool operator <(Fractions& rhs);
+    bool operator <(const Fractions& rhs) const;
+    bool operator <(int rhs);
+    bool operator >(int rhs);
 
 };
+
 
 #endif // FRACTIONS_H

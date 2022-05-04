@@ -3,6 +3,7 @@
 
 #include <vector>
 #include <stack>
+#include <algorithm>
 #include "fractions.h"
 
 using namespace std;
@@ -11,6 +12,10 @@ struct Simplex_matrix
 {
     explicit Simplex_matrix(vector<vector<int>>& matrix, bool comon_fractions = true);
     Fractions translate_int_to_Fractions(const int x, const int y = 1);
+
+public:
+    const vector<vector<Fractions> > &getRestirctions_matrix() const;
+
 private:
     vector<vector<Fractions>> restirctions_matrix;
 };
@@ -29,7 +34,7 @@ public:
     //Возвращает вектор всех возможных базисов для последней матрицы в стеке
     vector<pair<int, int>> possible_basis();
 
-    void next_simpex_matrix(int x, int y);
+    void next_simplex_matrix(int x, int y);
 };
 
 #endif // SIMPLEX_H

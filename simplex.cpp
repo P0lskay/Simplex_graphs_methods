@@ -9,7 +9,42 @@ Simplex::Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task, bo
     all_matrix.push(first_matrix);
 }
 
-void Simplex::next_simpex_matrix(int x, int y)
+vector<pair<int, int>> Simplex::possible_basis()
+{
+    vector<pair<int, int>> result;
+
+    //Получаем последнюю матрицу, с которой и будем работать
+    vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
+
+    int index_last_row = last_matrix.size()-1;
+    //Перебираем все колонки в поисках отрицательного элемента на последней строке
+    for(int i = 0; i < last_matrix[index_last_row].size()-1; i++)
+    {
+        if(last_matrix[index_last_row][i] < 0)
+        {
+            //Собираем все Bi/Xi текущего столбца и находим там неотрицательный минимум
+            vector<Fractions> this_column;
+            for(int j = 0; j < index_last_row; j++)
+            {
+                if(last_matrix[j][i] > 0)
+                    this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
+            }
+            if(this_column.size()>0)
+            {
+                auto min_elem = *min_element(this_column.begin(), this_column.end());
+                //Теперь добавляем все координаты, элементы которых равны минимуму
+                for(int j = 0; j < index_last_row; j++)
+                {
+                    if(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem)
+                        result.push_back({j, i});
+                }
+            }
+        }
+    }
+    return result;
+}
+
+void Simplex::next_simplex_matrix(int x, int y)
 {
     //Получаем последнюю матрицу, с которой и будем работать
     Simplex_matrix last_matrix = all_matrix.top();
@@ -48,4 +83,9 @@ Simplex_matrix::Simplex_matrix(vector<vector<int>>& matrix, bool comon_fractions
 Fractions Simplex_matrix::translate_int_to_Fractions(const int x, const int y)
 {
     return Fractions(x, y);
+}
+
+const vector<vector<Fractions> > &Simplex_matrix::getRestirctions_matrix() const
+{
+    return restirctions_matrix;
 }
