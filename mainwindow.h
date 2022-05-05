@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <vector>
 #include <QMessageBox>
+#include<QDebug>
+#include "simplex.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -16,6 +18,7 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+    Simplex simplex= *new Simplex();
 
 private slots:
     //При изменении кол-ва переменных или ограничений нужно поменять соответсвующие переменные и
@@ -30,7 +33,9 @@ private:
     //Переменные хранящие кол-во ограничений и переменных
     int restriction_num = 0;
     int variables_num = 0;
-
+    //Координаты в таблице симплекс метода
+    int x = 0;
+    int y = 0;
     //Вектора, хранящие значения переменных для основной задачи и для ограничений соответсвенно
     //Они будут отправляться в класс с симплекс методом и графическим методом
     std::vector<int> main_task;
@@ -38,4 +43,6 @@ private:
     Ui::MainWindow *ui;
 
 };
+
+
 #endif // MAINWINDOW_H

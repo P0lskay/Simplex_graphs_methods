@@ -71,6 +71,14 @@ bool Fractions::operator >(int rhs)
     return static_cast<double>(this->fraction.first/this->fraction.second) > rhs;
 }
 
+Fractions::operator string() const
+{
+    if(fraction.second == 1)
+        return to_string(fraction.first);
+
+    return (to_string(fraction.first) + "/" + to_string(fraction.second));
+}
+
  bool Fractions::operator <(int rhs)
  {
     return static_cast<double>(this->fraction.first/this->fraction.second) < rhs;

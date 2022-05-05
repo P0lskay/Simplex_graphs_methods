@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-#include "simplex.h"
+
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -86,31 +86,51 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
         }
     }
 }
-
 //При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
 void MainWindow::on_btn_send_into_data_released()
 {
     QRegExp re("\\d*"); //Регулярное выражение для проверки на соответствие строки числу
 
-    for(int i = 0; i < variables_num+1; i++)
+    try
     {
-        //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
-        if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
-            QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
-
-        main_task.push_back(ui->table_task_data->item(0, i)->text().toInt());
-    }
-
-    for(int i = 0; i < restriction_num; i++)
-    {
-        restrictions_matrix.push_back({});
-        for(int j = 0; j < variables_num+1; j++)
+        for(int i = 0; i < variables_num+1; i++)
         {
             //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
-            if(!re.exactMatch(ui->table_restrictions_data->item(i, j)->text()))
-                QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
-            restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
+            if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
+                throw exception();
+
+            main_task.push_back(ui->table_task_data->item(0, i)->text().toInt());
         }
+
+        for(int i = 0; i < restriction_num; i++)
+        {
+            restrictions_matrix.push_back({});
+            for(int j = 0; j < variables_num+1; j++)
+            {
+                //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
+                if(!re.exactMatch(ui->table_restrictions_data->item(i, j)->text()))
+                    throw exception();
+                restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
+            }
+        }
+
+        simplex = *new Simplex(restrictions_matrix, main_task, true , true);
+
+        vector<pair<int, int>> all_basis = simplex.possible_basis();
+        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+        for(int i = x; i < x + current_matrix.size(); i++)
+        {
+            for(int j = 0; j < current_matrix[i-x].size(); j++)
+            {
+                ui->simplex_first_table->setItem(i, j, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i-x][j])));
+            }
+        }
+
+    }  catch (exception ex) {
+        QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
     }
+
+
 }
 

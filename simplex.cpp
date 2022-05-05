@@ -1,6 +1,11 @@
 #include "simplex.h"
 #include "fractions.h"
 
+Simplex::Simplex()
+{
+
+}
+
 Simplex::Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task, bool comon_fractions)
 {
     Simplex_matrix first_matrix(matrix, comon_fractions);
@@ -45,6 +50,11 @@ vector<pair<int, int>> Simplex::possible_basis()
         }
     }
     return result;
+}
+
+vector<vector<Fractions> > Simplex::getLast_matrix()
+{
+    return all_matrix.top().getRestirctions_matrix();
 }
 
 void Simplex::next_simplex_matrix(int x, int y)

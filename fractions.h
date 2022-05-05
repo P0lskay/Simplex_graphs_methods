@@ -2,6 +2,7 @@
 #define FRACTIONS_H
 
 #include <utility>
+#include <string>
 
 using namespace std;
 
@@ -26,6 +27,7 @@ public:
     bool operator <(const Fractions& rhs) const;
     bool operator <(int rhs);
     bool operator >(int rhs);
+    operator string() const;
 
 };
 

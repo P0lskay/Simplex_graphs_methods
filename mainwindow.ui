@@ -44,7 +44,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>1</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -314,7 +314,7 @@
        <attribute name="title">
         <string>Вспомогательная задача</string>
        </attribute>
-       <widget class="QTableWidget" name="tableWidget">
+       <widget class="QTableWidget" name="simplex_first_table">
         <property name="geometry">
          <rect>
           <x>0</x>
