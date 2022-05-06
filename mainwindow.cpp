@@ -89,10 +89,19 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
 //При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
 void MainWindow::on_btn_send_into_data_released()
 {
-    QRegExp re("\\d*"); //Регулярное выражение для проверки на соответствие строки числу
+    QRegExp re("[-]*\\d*"); //Регулярное выражение для проверки на соответствие строки числу
 
     try
     {
+        for (int i = 1; i < variables_num+1; i++) {
+            current_matrix_row.push_back(to_string(i));
+        }
+
+
+        for (int i = variables_num + 1; i < restriction_num + variables_num+1; i++) {
+            current_matrix_column.push_back(to_string(i));
+        }
+
         for(int i = 0; i < variables_num+1; i++)
         {
             //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
@@ -119,11 +128,33 @@ void MainWindow::on_btn_send_into_data_released()
         vector<pair<int, int>> all_basis = simplex.possible_basis();
         vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
 
-        for(int i = x; i < x + current_matrix.size(); i++)
+        //Выводим заголовок столбцов матрицы X1 ... Xn b
+        ui->simplex_first_table->setItem(x, y, new QTableWidgetItem(QString::fromStdString("X(" + to_string(num_iter) + ")")));
+
+        for(int i = y+1, j = 0; j < current_matrix_row.size(); i++, j++)
+        {
+            ui->simplex_first_table->setItem(x, i, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_row[j] + ")")));
+        }
+
+        ui->simplex_first_table->setItem(x, y + current_matrix_row.size() + 1, new QTableWidgetItem("b"));
+
+        //Выводим заголовок строк матрицы Xn .. Xm
+        for(int i = x + 1, j = 0; j < current_matrix_column.size(); i++, j++)
+        {
+            ui->simplex_first_table->setItem(i, y, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_column[j] + ")")));
+        }
+
+
+        for(int i = 0; i < current_matrix.size() ; i++)
         {
             for(int j = 0; j < current_matrix[i-x].size(); j++)
             {
-                ui->simplex_first_table->setItem(i, j, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i-x][j])));
+                ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i-x][j])));
+                pair<int, int> basis = {i-x, j};
+                if(std::find(all_basis.begin(), all_basis.end(), basis) != all_basis.end())
+                {
+                    ui->simplex_first_table->item(i+ x + 1, j+1)->setBackgroundColor(QColor(255, 0, 0));
+                }
             }
         }
 

@@ -14,6 +14,7 @@ Simplex::Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task, bo
         free_var.push_back(i);
     this->common_fractions = comon_fractions;
     this->min_task = min_task;
+
     all_matrix.push(first_matrix);
 }
 

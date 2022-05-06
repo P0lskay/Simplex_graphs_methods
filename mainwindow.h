@@ -3,8 +3,11 @@
 
 #include <QMainWindow>
 #include <vector>
+#include <string>
 #include <QMessageBox>
-#include<QDebug>
+#include <QDebug>
+#include <algorithm>
+#include <QColor>
 #include "simplex.h"
 
 QT_BEGIN_NAMESPACE
@@ -30,12 +33,16 @@ private slots:
     void on_btn_send_into_data_released();
 
 private:
+    int num_iter = 0; //Номер итерации вспомогательной задачи
     //Переменные хранящие кол-во ограничений и переменных
     int restriction_num = 0;
     int variables_num = 0;
     //Координаты в таблице симплекс метода
     int x = 0;
     int y = 0;
+    //Вектора, хранящие заголовки матриц
+    vector<string> current_matrix_row;
+    vector<string> current_matrix_column;
     //Вектора, хранящие значения переменных для основной задачи и для ограничений соответсвенно
     //Они будут отправляться в класс с симплекс методом и графическим методом
     std::vector<int> main_task;
