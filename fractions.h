@@ -29,7 +29,7 @@ public:
     bool operator >(int rhs);
     operator string() const;
 
+    static void setCommon_fractions(bool newCommon_fractions);
 };
-
 
 #endif // FRACTIONS_H

@@ -8,6 +8,8 @@ Simplex::Simplex()
 
 Simplex::Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task, bool comon_fractions)
 {
+
+    (new Fractions(1))->setCommon_fractions(comon_fractions);
     Simplex_matrix first_matrix(matrix, comon_fractions);
     //Заполняем вектор свободными переменными, которые нужно будет перетащить
     for(int i = 0; i < matrix.size(); i++)
@@ -18,7 +20,7 @@ Simplex::Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task, bo
     all_matrix.push(first_matrix);
 }
 
-vector<pair<int, int>> Simplex::possible_basis()
+vector<pair<int, int>> Simplex::possible_basis_free()
 {
     vector<pair<int, int>> result;
 
@@ -58,6 +60,11 @@ vector<vector<Fractions> > Simplex::getLast_matrix()
     return all_matrix.top().getRestirctions_matrix();
 }
 
+int Simplex::getSizeMatrixStack() const
+{
+    return all_matrix.size();
+}
+
 void Simplex::next_simplex_matrix(int x, int y)
 {
     //Получаем последнюю матрицу, с которой и будем работать
@@ -85,14 +92,17 @@ void Simplex::next_simplex_matrix(int x, int y)
     for(int i = 0; i < last_matrix.size(); i++)
     {
         if(i != x)
-            last_matrix[i][y] = Fractions(-1, 1) * last_matrix[x][i] * last_matrix[x][y];
+            last_matrix[i][y] = Fractions(-1, 1) * last_matrix[i][y] * last_matrix[x][y];
+        last_matrix[i].erase(last_matrix[i].begin()+y);
     }
+    deleted_free_var.push(free_var[x]);
+    free_var.erase(free_var.begin()+x);
 
     all_matrix.push(Simplex_matrix(last_matrix));
 }
 
 
-Simplex_matrix::Simplex_matrix(vector<vector<int>>& matrix, bool comon_fractions)
+Simplex_matrix::Simplex_matrix(vector<vector<int>>& matrix, bool common_fractions)
 {
     //Сначала переводим всю матрицу в новую таблицу
     for(int i = 0; i < matrix.size(); i++)

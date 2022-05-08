@@ -1,5 +1,7 @@
 #include "fractions.h"
 
+static bool common_fractions = true;
+
 const pair<int, int> &Fractions::getFraction() const
 {
     return fraction;
@@ -73,10 +75,16 @@ bool Fractions::operator >(int rhs)
 
 Fractions::operator string() const
 {
+    if(common_fractions && fraction.first != 0)
+    {
     if(fraction.second == 1)
         return to_string(fraction.first);
 
     return (to_string(fraction.first) + "/" + to_string(fraction.second));
+    }
+    if(fraction.first == 0)
+        return "0";
+    return to_string(static_cast<double>(fraction.first)/static_cast<double>(fraction.second));
 }
 
  bool Fractions::operator <(int rhs)
@@ -85,7 +93,12 @@ Fractions::operator string() const
  }
 
 
-Fractions::Fractions(int x, int y)
+ void Fractions::setCommon_fractions(bool newCommon_fractions)
+ {
+     common_fractions = newCommon_fractions;
+ }
+
+ Fractions::Fractions(int x, int y)
 {
     fraction = {x, y};
 }

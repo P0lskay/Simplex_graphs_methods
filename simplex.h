@@ -35,9 +35,12 @@ public:
     //Там матрица переходит в формат обыкновенных дробей
     Simplex();
     explicit Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task = true, bool comon_fractions = true);
+    //Возвращает вектор всех возможных базисов свободных переменных для последней матрицы в стеке
+    vector<pair<int, int>> possible_basis_free();
     //Возвращает вектор всех возможных базисов для последней матрицы в стеке
     vector<pair<int, int>> possible_basis();
     vector<vector<Fractions>> getLast_matrix();
+    int getSizeMatrixStack() const;
     void next_simplex_matrix(int x, int y);
 };
 

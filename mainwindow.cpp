@@ -93,6 +93,11 @@ void MainWindow::on_btn_send_into_data_released()
 
     try
     {
+        if(ui->type_fractions->currentText() == "Десятичный")
+            common_fractions = false;
+        else
+            common_fractions = true;
+
         for (int i = 1; i < variables_num+1; i++) {
             current_matrix_row.push_back(to_string(i));
         }
@@ -123,45 +128,129 @@ void MainWindow::on_btn_send_into_data_released()
             }
         }
 
-        simplex = *new Simplex(restrictions_matrix, main_task, true , true);
-
-        vector<pair<int, int>> all_basis = simplex.possible_basis();
-        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
-
-        //Выводим заголовок столбцов матрицы X1 ... Xn b
-        ui->simplex_first_table->setItem(x, y, new QTableWidgetItem(QString::fromStdString("X(" + to_string(num_iter) + ")")));
-
-        for(int i = y+1, j = 0; j < current_matrix_row.size(); i++, j++)
-        {
-            ui->simplex_first_table->setItem(x, i, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_row[j] + ")")));
-        }
-
-        ui->simplex_first_table->setItem(x, y + current_matrix_row.size() + 1, new QTableWidgetItem("b"));
-
-        //Выводим заголовок строк матрицы Xn .. Xm
-        for(int i = x + 1, j = 0; j < current_matrix_column.size(); i++, j++)
-        {
-            ui->simplex_first_table->setItem(i, y, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_column[j] + ")")));
-        }
-
-
-        for(int i = 0; i < current_matrix.size() ; i++)
-        {
-            for(int j = 0; j < current_matrix[i-x].size(); j++)
-            {
-                ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i-x][j])));
-                pair<int, int> basis = {i-x, j};
-                if(std::find(all_basis.begin(), all_basis.end(), basis) != all_basis.end())
-                {
-                    ui->simplex_first_table->item(i+ x + 1, j+1)->setBackgroundColor(QColor(255, 0, 0));
-                }
-            }
-        }
+        start_simplex();
 
     }  catch (exception ex) {
         QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
     }
 
 
+}
+
+void MainWindow::cout_matrix_header_first_table() const
+{
+    //Выводим заголовок столбцов матрицы X1 ... Xn b
+    ui->simplex_first_table->setItem(x, y, new QTableWidgetItem(QString::fromStdString("X(" + to_string(num_iter) + ")")));
+
+    for(int i = y+1, j = 0; j < current_matrix_row.size(); i++, j++)
+    {
+        ui->simplex_first_table->setItem(x, i, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_row[j] + ")")));
+    }
+
+    ui->simplex_first_table->setItem(x, y + current_matrix_row.size() + 1, new QTableWidgetItem("b"));
+
+    //Выводим заголовок строк матрицы Xn .. Xm
+    for(int i = x + 1, j = 0; j < current_matrix_column.size(); i++, j++)
+    {
+        ui->simplex_first_table->setItem(i, y, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_column[j] + ")")));
+    }
+}
+
+void MainWindow::start_simplex()
+{
+    simplex = *new Simplex(restrictions_matrix, main_task, true , common_fractions);
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+    cout_matrix_header_first_table();
+
+
+    for(int i = 0; i < current_matrix.size() ; i++)
+    {
+        for(int j = 0; j < current_matrix[i-x].size(); j++)
+        {
+            //Заполняем матрицу
+            ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
+            //Выделяем все возможные базисы
+            select_basis(i, j);
+        }
+    }
+}
+
+
+void MainWindow::on_simplex_first_table_cellDoubleClicked(int row, int column)
+{
+    vector<pair<int, int>> all_basis = simplex.possible_basis_free();
+
+
+    pair<int, int> check_basis = {row-x-1, column-y-1};
+    if(all_basis.size()>0 && current_basis != check_basis)
+    {
+        if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
+        {
+            ui->simplex_first_table->item(row, column)->setBackgroundColor(QColor(0, 255, 0));
+
+            ui->simplex_first_table->item(current_basis.first + x + 1, current_basis.second + y + 1)->setBackgroundColor(QColor(255, 0, 0));
+
+            current_basis = check_basis;
+        }
+    }
+
+}
+
+void MainWindow::select_basis(int row, int column)
+{
+    vector<pair<int, int>> all_basis = simplex.possible_basis_free();
+    pair<int, int> check_basis = {row, column};
+
+    if(all_basis.size()>0)
+    {
+        current_basis = all_basis[0];
+        if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
+        {
+            ui->simplex_first_table->item(row+ x + 1, column+y+1)->setBackgroundColor(QColor(255, 0, 0));
+        }
+        if(check_basis == current_basis)
+        {
+            ui->simplex_first_table->item(row + x + 1, column + y +1)->setBackgroundColor(QColor(0, 255, 0));
+        }
+    }
+}
+
+
+void MainWindow::on_btn_next_simplex_first_released()
+{
+    ui->btn_last_simplex_first->setEnabled(true);
+
+    x+= restriction_num + 3;
+
+    simplex.next_simplex_matrix(current_basis.first, current_basis.second);
+
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+    current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second];
+    current_matrix_row.erase(current_matrix_row.begin()+current_basis.second);
+
+    cout_matrix_header_first_table();
+
+
+    for(int i = 0; i < current_matrix.size() ; i++)
+    {
+        for(int j = 0; j < current_matrix[i].size(); j++)
+        {
+            //Заполняем матрицу
+            ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
+            //Выделяем все возможные базисы
+            select_basis(i, j);
+        }
+    }
+}
+
+
+void MainWindow::on_btn_last_simplex_first_released()
+{
+    if(simplex.getSizeMatrixStack() < 2)
+    {
+        ui->btn_last_simplex_first->setEnabled(false);
+    }
 }
 
