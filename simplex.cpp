@@ -1,6 +1,6 @@
 #include "simplex.h"
 #include "fractions.h"
-
+#include <QtDebug>
 Simplex::Simplex()
 {
 
@@ -55,6 +55,41 @@ vector<pair<int, int>> Simplex::possible_basis_free()
     return result;
 }
 
+vector<pair<int, int> > Simplex::possible_basis()
+{
+    vector<pair<int, int>> result;
+
+    //Получаем последнюю матрицу, с которой и будем работать
+    vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
+
+    int index_last_row = last_matrix.size()-1;
+    //Перебираем все колонки в поисках отрицательного элемента на последней строке
+    for(int i = 0; i < last_matrix[index_last_row].size()-1; i++)
+    {
+        if(last_matrix[index_last_row][i] < 0)
+        {
+            //Собираем все Bi/Xi текущего столбца и находим там неотрицательный минимум
+            vector<Fractions> this_column;
+            for(int j = 0; j < index_last_row; j++)
+            {
+                if(last_matrix[j][i] > 0)
+                    this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
+            }
+            if(this_column.size()>0)
+            {
+                auto min_elem = *min_element(this_column.begin(), this_column.end());
+                //Теперь добавляем все координаты, элементы которых равны минимуму
+                for(int j = 0; j < index_last_row; j++)
+                {
+                    if(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem)
+                        result.push_back({j, i});
+                }
+            }
+        }
+    }
+    return result;
+}
+
 vector<vector<Fractions> > Simplex::getLast_matrix()
 {
     return all_matrix.top().getRestirctions_matrix();
@@ -65,7 +100,7 @@ int Simplex::getSizeMatrixStack() const
     return all_matrix.size();
 }
 
-void Simplex::next_simplex_matrix(int x, int y)
+void Simplex::next_simplex_matrix_free(int x, int y)
 {
     //Получаем последнюю матрицу, с которой и будем работать
     vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
@@ -95,8 +130,42 @@ void Simplex::next_simplex_matrix(int x, int y)
             last_matrix[i][y] = Fractions(-1, 1) * last_matrix[i][y] * last_matrix[x][y];
         last_matrix[i].erase(last_matrix[i].begin()+y);
     }
-    deleted_free_var.push(free_var[x]);
-    free_var.erase(free_var.begin()+x);
+    qDebug() << 11;
+    deleted_free_var.push(*find(free_var.begin(), free_var.end(), x));
+    qDebug() << 12;
+    free_var.erase(remove(free_var.begin(), free_var.end(), x), free_var.end());
+
+    all_matrix.push(Simplex_matrix(last_matrix));
+}
+
+void Simplex::next_simplex_matrix(int x, int y)
+{
+    //Получаем последнюю матрицу, с которой и будем работать
+    vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
+
+    last_matrix[x][y] = Fractions(1, 1) / last_matrix[x][y];
+    for(int i = 0; i < last_matrix[x].size(); i++)
+    {
+        if(i != y)
+            last_matrix[x][i] = last_matrix[x][i] * last_matrix[x][y];
+    }
+
+    for(int i = 0; i < last_matrix.size(); i++)
+    {
+        for(int j = 0; j < last_matrix[i].size(); j++)
+        {
+            if(i != x && j != y)
+            {
+                Fractions current_var = last_matrix[x][j] * last_matrix[i][y];
+                last_matrix[i][j] = last_matrix[i][j] - current_var;
+            }
+        }
+    }
+    for(int i = 0; i < last_matrix.size(); i++)
+    {
+        if(i != x)
+            last_matrix[i][y] = Fractions(-1, 1) * last_matrix[i][y] * last_matrix[x][y];
+    }
 
     all_matrix.push(Simplex_matrix(last_matrix));
 }

@@ -26,6 +26,8 @@ class Simplex
 {
     stack<Simplex_matrix> all_matrix;
     vector<Fractions> task_vec;
+    //хранятся свободные переменные и свободные удаленные.
+    //где свободная переменная - Xk, где k = m+i.
     vector<int> free_var;
     stack<int> deleted_free_var;
     bool min_task;
@@ -41,6 +43,7 @@ public:
     vector<pair<int, int>> possible_basis();
     vector<vector<Fractions>> getLast_matrix();
     int getSizeMatrixStack() const;
+    void next_simplex_matrix_free(int x, int y);
     void next_simplex_matrix(int x, int y);
 };
 

@@ -201,9 +201,22 @@ void MainWindow::select_basis(int row, int column)
 {
     vector<pair<int, int>> all_basis = simplex.possible_basis_free();
     pair<int, int> check_basis = {row, column};
-
+    //Если есть базис искусственных переменных, то выделяем только его, иначе все возможные базисы
     if(all_basis.size()>0)
     {
+        current_basis = all_basis[0];
+        if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
+        {
+            ui->simplex_first_table->item(row+ x + 1, column+y+1)->setBackgroundColor(QColor(255, 0, 0));
+        }
+        if(check_basis == current_basis)
+        {
+            ui->simplex_first_table->item(row + x + 1, column + y +1)->setBackgroundColor(QColor(0, 255, 0));
+        }
+    }
+    else if(simplex.possible_basis().size() > 0)
+    {
+        all_basis = simplex.possible_basis();
         current_basis = all_basis[0];
         if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
         {
@@ -220,27 +233,37 @@ void MainWindow::select_basis(int row, int column)
 void MainWindow::on_btn_next_simplex_first_released()
 {
     ui->btn_last_simplex_first->setEnabled(true);
+    qDebug() << 1;
 
-    x+= restriction_num + 3;
-
-    simplex.next_simplex_matrix(current_basis.first, current_basis.second);
-
-    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
-
-    current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second];
-    current_matrix_row.erase(current_matrix_row.begin()+current_basis.second);
-
-    cout_matrix_header_first_table();
-
-
-    for(int i = 0; i < current_matrix.size() ; i++)
+    //Проверяем базисы искусственных переменных
+    if(simplex.possible_basis_free().size() > 0)
     {
-        for(int j = 0; j < current_matrix[i].size(); j++)
+
+        qDebug() << 8;
+        x+= restriction_num + 3;
+
+        simplex.next_simplex_matrix_free(current_basis.first, current_basis.second);
+        qDebug() << 1;
+
+        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+        current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second]; //2
+        qDebug() << 2;
+        current_matrix_row.erase(current_matrix_row.begin()+current_basis.second);
+        qDebug() << 3;
+
+        cout_matrix_header_first_table(); //3
+
+
+        for(int i = 0; i < current_matrix.size() ; i++)
         {
-            //Заполняем матрицу
-            ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
-            //Выделяем все возможные базисы
-            select_basis(i, j);
+            for(int j = 0; j < current_matrix[i].size(); j++)
+            {
+                //Заполняем матрицу
+                ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
+                //Выделяем все возможные базисы
+                select_basis(i, j);
+            }
         }
     }
 }
