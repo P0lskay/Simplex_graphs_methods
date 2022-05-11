@@ -73,6 +73,11 @@ bool Fractions::operator >(int rhs)
     return static_cast<double>(this->fraction.first/this->fraction.second) > rhs;
 }
 
+bool Fractions::operator ==(int rhs)
+{
+    return static_cast<double>(static_cast<double>(this->fraction.first)/static_cast<double>(this->fraction.second)) == rhs;
+}
+
 Fractions::operator string() const
 {
     if(common_fractions && fraction.first != 0)

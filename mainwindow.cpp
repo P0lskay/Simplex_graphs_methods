@@ -8,7 +8,6 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     setWindowTitle("Лабораторная работа по методам оптимизации");
-
     qApp->installEventFilter(this);
 }
 
@@ -89,6 +88,7 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
 //При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
 void MainWindow::on_btn_send_into_data_released()
 {
+
     QRegExp re("[-]*\\d*"); //Регулярное выражение для проверки на соответствие строки числу
 
     try
@@ -99,12 +99,12 @@ void MainWindow::on_btn_send_into_data_released()
             common_fractions = true;
 
         for (int i = 1; i < variables_num+1; i++) {
-            current_matrix_row.push_back(to_string(i));
+            current_matrix_row.push_back(i);
         }
 
 
         for (int i = variables_num + 1; i < restriction_num + variables_num+1; i++) {
-            current_matrix_column.push_back(to_string(i));
+            current_matrix_column.push_back(i);
         }
 
         for(int i = 0; i < variables_num+1; i++)
@@ -113,7 +113,7 @@ void MainWindow::on_btn_send_into_data_released()
             if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
                 throw exception();
 
-            main_task.push_back(ui->table_task_data->item(0, i)->text().toInt());
+            main_task.push_back(Fractions(ui->table_task_data->item(0, i)->text().toInt()));
         }
 
         for(int i = 0; i < restriction_num; i++)
@@ -144,7 +144,7 @@ void MainWindow::cout_matrix_header_first_table() const
 
     for(int i = y+1, j = 0; j < current_matrix_row.size(); i++, j++)
     {
-        ui->simplex_first_table->setItem(x, i, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_row[j] + ")")));
+        ui->simplex_first_table->setItem(x, i, new QTableWidgetItem(QString::fromStdString("X(" + to_string(current_matrix_row[j]) + ")")));
     }
 
     ui->simplex_first_table->setItem(x, y + current_matrix_row.size() + 1, new QTableWidgetItem("b"));
@@ -152,13 +152,64 @@ void MainWindow::cout_matrix_header_first_table() const
     //Выводим заголовок строк матрицы Xn .. Xm
     for(int i = x + 1, j = 0; j < current_matrix_column.size(); i++, j++)
     {
-        ui->simplex_first_table->setItem(i, y, new QTableWidgetItem(QString::fromStdString("X(" + current_matrix_column[j] + ")")));
+        ui->simplex_first_table->setItem(i, y, new QTableWidgetItem(QString::fromStdString("X(" + to_string(current_matrix_column[j]) + ")")));
+    }
+}
+
+bool MainWindow::check_simplex_end()
+{
+    if(simplex.possible_basis().size() == 0)
+    {
+        return true;
+    }
+    return false;
+}
+
+bool MainWindow::check_simplex_error()
+{
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+    bool result = false;
+
+    for(int i = 0; i < current_matrix[0].size() ; i++)
+    {
+        for(int j = 0; j < current_matrix.size(); j++)
+        {
+           if(current_matrix[j][i] < 0)
+           {
+               result = true;
+           }
+           else
+           {
+               result = false;
+               break;
+           }
+        }
+        if(result)
+            return result;
+    }
+
+    return result;
+}
+
+void MainWindow::refrsh_main_task()
+{
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+    for(int i = 0; i < current_matrix.size()-1; i++)
+    {
+        for(int j = 0; i < current_matrix[i].size()-1; i++)
+        {
+            auto t = main_task[current_matrix_column[i]-1] * current_matrix[i][j];
+            main_task[current_matrix_row[j]-1] = main_task[current_matrix_row[j]-1] - t;
+            main_task[current_matrix_column[i]-1] = Fractions(0);
+        }
     }
 }
 
 void MainWindow::start_simplex()
 {
-    simplex = *new Simplex(restrictions_matrix, main_task, true , common_fractions);
+    simplex = *new Simplex(restrictions_matrix, true , common_fractions);
     vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
 
     cout_matrix_header_first_table();
@@ -233,26 +284,23 @@ void MainWindow::select_basis(int row, int column)
 void MainWindow::on_btn_next_simplex_first_released()
 {
     ui->btn_last_simplex_first->setEnabled(true);
-    qDebug() << 1;
 
     //Проверяем базисы искусственных переменных
     if(simplex.possible_basis_free().size() > 0)
     {
 
-        qDebug() << 8;
         x+= restriction_num + 3;
 
         simplex.next_simplex_matrix_free(current_basis.first, current_basis.second);
-        qDebug() << 1;
 
         vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
 
-        current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second]; //2
-        qDebug() << 2;
-        current_matrix_row.erase(current_matrix_row.begin()+current_basis.second);
-        qDebug() << 3;
+        current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second];
 
-        cout_matrix_header_first_table(); //3
+        current_matrix_row.erase(current_matrix_row.begin()+current_basis.second);
+
+
+        cout_matrix_header_first_table();
 
 
         for(int i = 0; i < current_matrix.size() ; i++)
@@ -265,6 +313,62 @@ void MainWindow::on_btn_next_simplex_first_released()
                 select_basis(i, j);
             }
         }
+    }
+    else if(simplex.possible_basis().size() > 0)
+    {
+        x+= restriction_num + 3;
+
+        simplex.next_simplex_matrix_free(current_basis.first, current_basis.second);
+
+        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+        int t = current_matrix_column[current_basis.first];
+
+        current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second];
+
+        current_matrix_row[current_basis.second] = t;
+
+
+        cout_matrix_header_first_table();
+
+
+        for(int i = 0; i < current_matrix.size() ; i++)
+        {
+            for(int j = 0; j < current_matrix[i].size(); j++)
+            {
+                //Заполняем матрицу
+                ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
+                //Выделяем все возможные базисы
+                select_basis(i, j);
+            }
+        }
+    }
+    if(check_simplex_end())
+    {
+        qDebug() << "Test";
+        ui->btn_next_simplex_first->setEnabled(false);
+        refrsh_main_task();
+        string res_cout = "";
+        for (int i = 0; i < main_task.size()-1; i++)
+        {
+            if(!(main_task[i] == 0))
+            {
+                if(res_cout.length() > 0)
+                {
+
+                    res_cout += "+ (" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
+                }
+                else
+                    res_cout += "f* = (" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
+            }
+        }
+
+        ui->cout_simplex_task_first->setText(QString::fromStdString(res_cout));
+    }
+    else if(check_simplex_error())
+    {
+        ui->btn_next_simplex_first->setEnabled(false);
+        ui->cout_simplex_task_first->setText(QString::fromStdString("Функция не ограничена. Решения нет!"));
     }
 }
 

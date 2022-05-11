@@ -36,7 +36,7 @@ public:
     //Создав объект Симплекс, мы создаем первую матрицу задачи в классе Simplex_matrix
     //Там матрица переходит в формат обыкновенных дробей
     Simplex();
-    explicit Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task = true, bool comon_fractions = true);
+    explicit Simplex(vector<vector<int>> matrix, bool min_task = true, bool comon_fractions = true);
     //Возвращает вектор всех возможных базисов свободных переменных для последней матрицы в стеке
     vector<pair<int, int>> possible_basis_free();
     //Возвращает вектор всех возможных базисов для последней матрицы в стеке

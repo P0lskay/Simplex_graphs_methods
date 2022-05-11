@@ -49,13 +49,13 @@ private:
     int x = 0;
     int y = 0;
     //Вектора, хранящие заголовки матриц
-    vector<string> current_matrix_row;
-    vector<string> current_matrix_column;
+    vector<int> current_matrix_row;
+    vector<int> current_matrix_column;
     //Текущий базис
     pair<int, int> current_basis;
     //Вектора, хранящие значения переменных для основной задачи и для ограничений соответсвенно
     //Они будут отправляться в класс с симплекс методом и графическим методом
-    vector<int> main_task;
+    vector<Fractions> main_task;
     vector<vector<int>> restrictions_matrix;
 
     //Выделяет базис в координатах row, column
@@ -63,7 +63,11 @@ private:
     //Вывод заголовка текущей матрицы для вспомогательной задачи
     void cout_matrix_header_first_table() const;
 
-    void check_simplex_end();
+    bool check_simplex_end();
+    //Метод, проверяющий, нужно ли решать задачу
+    bool check_simplex_error();
+    //Метод обновляющий главную задачу после решения вспомогательной задачи
+    void refrsh_main_task();
 
     void start_simplex();
 

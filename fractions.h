@@ -27,6 +27,7 @@ public:
     bool operator <(const Fractions& rhs) const;
     bool operator <(int rhs);
     bool operator >(int rhs);
+    bool operator ==(int rhs);
     operator string() const;
 
     static void setCommon_fractions(bool newCommon_fractions);

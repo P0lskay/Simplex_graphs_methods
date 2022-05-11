@@ -1,12 +1,11 @@
 #include "simplex.h"
 #include "fractions.h"
-#include <QtDebug>
 Simplex::Simplex()
 {
 
 }
 
-Simplex::Simplex(vector<vector<int>> matrix, vector<int> task, bool min_task, bool comon_fractions)
+Simplex::Simplex(vector<vector<int>> matrix,  bool min_task, bool comon_fractions)
 {
 
     (new Fractions(1))->setCommon_fractions(comon_fractions);
@@ -52,6 +51,7 @@ vector<pair<int, int>> Simplex::possible_basis_free()
             }
         }
     }
+
     return result;
 }
 
@@ -130,9 +130,7 @@ void Simplex::next_simplex_matrix_free(int x, int y)
             last_matrix[i][y] = Fractions(-1, 1) * last_matrix[i][y] * last_matrix[x][y];
         last_matrix[i].erase(last_matrix[i].begin()+y);
     }
-    qDebug() << 11;
     deleted_free_var.push(*find(free_var.begin(), free_var.end(), x));
-    qDebug() << 12;
     free_var.erase(remove(free_var.begin(), free_var.end(), x), free_var.end());
 
     all_matrix.push(Simplex_matrix(last_matrix));
