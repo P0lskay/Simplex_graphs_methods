@@ -156,6 +156,51 @@ void MainWindow::cout_matrix_header_first_table() const
     }
 }
 
+void MainWindow::cout_matrix_header_second_table() const
+{
+    //Выводим заголовок столбцов матрицы X1 ... Xn b
+    ui->simplex_second_table->setItem(x1, y1, new QTableWidgetItem(QString::fromStdString("X(" + to_string(num_iter_main) + ")")));
+
+    for(int i = y1+1, j = 0; j < current_matrix_row.size(); i++, j++)
+    {
+        ui->simplex_second_table->setItem(x1, i, new QTableWidgetItem(QString::fromStdString("X(" + to_string(current_matrix_row[j]) + ")")));
+    }
+
+    ui->simplex_second_table->setItem(x1, y1 + current_matrix_row.size() + 1, new QTableWidgetItem("b"));
+
+    //Выводим заголовок строк матрицы Xn .. Xm
+    for(int i = x1 + 1, j = 0; j < current_matrix_column.size(); i++, j++)
+    {
+        ui->simplex_second_table->setItem(i, y1, new QTableWidgetItem(QString::fromStdString("X(" + to_string(current_matrix_column[j]) + ")")));
+    }
+}
+
+void MainWindow::start_main_task()
+{
+    //Создаем вектор, в котором будут хранится все коэффициенты для последней строки новой матрицы
+    vector<Fractions> vec;
+    for(int i = 0; i < current_matrix_row.size(); i++)
+    {
+        vec.push_back(main_task[current_matrix_row[i]-1]);
+    }
+    simplex.start_main_matrix(vec, main_task[main_task.size()-1]);
+
+    cout_matrix_header_second_table();
+
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+    for(int i = 0; i < current_matrix.size() ; i++)
+    {
+        for(int j = 0; j < current_matrix[i-x1].size(); j++)
+        {
+            //Заполняем матрицу
+            ui->simplex_second_table->setItem(i+ x1 + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
+            //Выделяем все возможные базисы
+            select_basis(i, j);
+        }
+    }
+    num_iter_main++;
+}
+
 bool MainWindow::check_simplex_end()
 {
     if(simplex.possible_basis().size() == 0)
@@ -198,12 +243,14 @@ void MainWindow::refrsh_main_task()
 
     for(int i = 0; i < current_matrix.size()-1; i++)
     {
-        for(int j = 0; i < current_matrix[i].size()-1; i++)
+        for(int j = 0; j < current_matrix[i].size()-1; j++)
         {
             auto t = main_task[current_matrix_column[i]-1] * current_matrix[i][j];
             main_task[current_matrix_row[j]-1] = main_task[current_matrix_row[j]-1] - t;
-            main_task[current_matrix_column[i]-1] = Fractions(0);
         }
+        auto t = main_task[current_matrix_column[i]-1] * current_matrix[i][current_matrix[i].size()-1];
+        main_task[main_task.size()-1] = main_task[main_task.size()-1] + t;
+        main_task[current_matrix_column[i]-1] = Fractions(0);
     }
 }
 
@@ -225,6 +272,7 @@ void MainWindow::start_simplex()
             select_basis(i, j);
         }
     }
+    num_iter++;
 }
 
 
@@ -313,6 +361,7 @@ void MainWindow::on_btn_next_simplex_first_released()
                 select_basis(i, j);
             }
         }
+        num_iter++;
     }
     else if(simplex.possible_basis().size() > 0)
     {
@@ -342,28 +391,30 @@ void MainWindow::on_btn_next_simplex_first_released()
                 select_basis(i, j);
             }
         }
+        num_iter++;
     }
     if(check_simplex_end())
     {
-        qDebug() << "Test";
         ui->btn_next_simplex_first->setEnabled(false);
         refrsh_main_task();
-        string res_cout = "";
+        string res_cout = "f* = ";
         for (int i = 0; i < main_task.size()-1; i++)
         {
             if(!(main_task[i] == 0))
             {
-                if(res_cout.length() > 0)
+                if(res_cout.length() > 5)
                 {
 
                     res_cout += "+ (" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
                 }
                 else
-                    res_cout += "f* = (" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
+                    res_cout += "(" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
             }
         }
-
+         res_cout += "+ (" + string(main_task[main_task.size()-1]) + ")" ;
         ui->cout_simplex_task_first->setText(QString::fromStdString(res_cout));
+
+        start_main_task();
     }
     else if(check_simplex_error())
     {

@@ -45,6 +45,8 @@ public:
     int getSizeMatrixStack() const;
     void next_simplex_matrix_free(int x, int y);
     void next_simplex_matrix(int x, int y);
+
+    void start_main_matrix(vector<Fractions> task, Fractions free_k);
 };
 
 #endif // SIMPLEX_H

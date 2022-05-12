@@ -1,5 +1,6 @@
 #include "simplex.h"
 #include "fractions.h"
+#include <QtDebug>
 Simplex::Simplex()
 {
 
@@ -165,6 +166,20 @@ void Simplex::next_simplex_matrix(int x, int y)
             last_matrix[i][y] = Fractions(-1, 1) * last_matrix[i][y] * last_matrix[x][y];
     }
 
+    all_matrix.push(Simplex_matrix(last_matrix));
+}
+
+void Simplex::start_main_matrix(vector<Fractions> task, Fractions free_k)
+{
+    //Получаем последнюю матрицу, с которой и будем работать
+    vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
+
+    for(int i = 0; i < last_matrix[last_matrix.size()-1].size()-1; i++)
+    {
+        qDebug() << i << " - " << QString::fromStdString((string) task[i]);
+        last_matrix[last_matrix.size()-1][i] = task[i];
+    }
+        last_matrix[last_matrix.size()-1][last_matrix[last_matrix.size()-1].size()-1] = free_k;
     all_matrix.push(Simplex_matrix(last_matrix));
 }
 

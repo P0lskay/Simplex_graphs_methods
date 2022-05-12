@@ -42,12 +42,18 @@ private slots:
 private:
     bool common_fractions;
     int num_iter = 0; //Номер итерации вспомогательной задачи
+    int num_iter_main = 0; //Номер итерации исходной задачи
     //Переменные хранящие кол-во ограничений и переменных
     int restriction_num = 0;
     int variables_num = 0;
-    //Координаты в таблице симплекс метода
+    //Координаты в таблице искусственного симплекс метода
     int x = 0;
     int y = 0;
+
+    //Координаты в таблице симплекс метода
+    int x1 = 0;
+    int y1 = 0;
+
     //Вектора, хранящие заголовки матриц
     vector<int> current_matrix_row;
     vector<int> current_matrix_column;
@@ -62,6 +68,9 @@ private:
     void select_basis(int row, int column);
     //Вывод заголовка текущей матрицы для вспомогательной задачи
     void cout_matrix_header_first_table() const;
+    void cout_matrix_header_second_table() const;
+    //Построение матрицы для исходной задачи
+    void start_main_task();
 
     bool check_simplex_end();
     //Метод, проверяющий, нужно ли решать задачу
