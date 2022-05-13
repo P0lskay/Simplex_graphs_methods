@@ -39,6 +39,10 @@ private slots:
 
     void on_btn_last_simplex_first_released();
 
+    void on_btn_next_simplex_second_released();
+
+    void on_simplex_second_table_cellDoubleClicked(int row, int column);
+
 private:
     bool common_fractions;
     int num_iter = 0; //Номер итерации вспомогательной задачи
@@ -66,6 +70,7 @@ private:
 
     //Выделяет базис в координатах row, column
     void select_basis(int row, int column);
+    void select_basis_main(int row, int column);
     //Вывод заголовка текущей матрицы для вспомогательной задачи
     void cout_matrix_header_first_table() const;
     void cout_matrix_header_second_table() const;
@@ -79,6 +84,8 @@ private:
     void refrsh_main_task();
 
     void start_simplex();
+
+    void full_vec_var(vector<Fractions>& vec);
 
     Ui::MainWindow *ui;
 

@@ -70,7 +70,7 @@ bool Fractions::operator <(const Fractions& rhs) const
 
 bool Fractions::operator >(int rhs)
 {
-    return static_cast<double>(this->fraction.first/this->fraction.second) > rhs;
+    return static_cast<double>(static_cast<double>(this->fraction.first)/static_cast<double>(this->fraction.second)) > rhs;
 }
 
 bool Fractions::operator ==(int rhs)

@@ -195,9 +195,15 @@ void MainWindow::start_main_task()
             //Заполняем матрицу
             ui->simplex_second_table->setItem(i+ x1 + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
             //Выделяем все возможные базисы
-            select_basis(i, j);
+            select_basis_main(i, j);
         }
     }
+
+    ui->btn_last_simplex_first->setEnabled(false);
+    ui->btn_next_simplex_first->setEnabled(false);
+    ui->btn_last_simplex_second->setEnabled(true);
+    ui->btn_next_simplex_second->setEnabled(true);
+
     num_iter_main++;
 }
 
@@ -275,6 +281,15 @@ void MainWindow::start_simplex()
     num_iter++;
 }
 
+void MainWindow::full_vec_var(vector<Fractions> &vec)
+{
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+    for(int i = 0; i < current_matrix.size()-1; i++)
+    {
+        vec[current_matrix_column[i]-1] = current_matrix[i][current_matrix[i].size()-1];
+    }
+}
+
 
 void MainWindow::on_simplex_first_table_cellDoubleClicked(int row, int column)
 {
@@ -328,6 +343,26 @@ void MainWindow::select_basis(int row, int column)
     }
 }
 
+void MainWindow::select_basis_main(int row, int column)
+{
+    vector<pair<int, int>> all_basis = simplex.possible_basis();
+    pair<int, int> check_basis = {row, column};
+    if(all_basis.size()>0)
+    {
+
+        qDebug() << 2;
+        current_basis = all_basis[0];
+        if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
+        {
+            ui->simplex_second_table->item(row + x1 + 1, column+y1+1)->setBackgroundColor(QColor(255, 0, 0));
+        }
+        if(check_basis == current_basis)
+        {
+            ui->simplex_second_table->item(row + x1 + 1, column + y1 +1)->setBackgroundColor(QColor(0, 255, 0));
+        }
+    }
+}
+
 
 void MainWindow::on_btn_next_simplex_first_released()
 {
@@ -367,7 +402,7 @@ void MainWindow::on_btn_next_simplex_first_released()
     {
         x+= restriction_num + 3;
 
-        simplex.next_simplex_matrix_free(current_basis.first, current_basis.second);
+        simplex.next_simplex_matrix(current_basis.first, current_basis.second);
 
         vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
 
@@ -415,6 +450,7 @@ void MainWindow::on_btn_next_simplex_first_released()
         ui->cout_simplex_task_first->setText(QString::fromStdString(res_cout));
 
         start_main_task();
+
     }
     else if(check_simplex_error())
     {
@@ -429,6 +465,91 @@ void MainWindow::on_btn_last_simplex_first_released()
     if(simplex.getSizeMatrixStack() < 2)
     {
         ui->btn_last_simplex_first->setEnabled(false);
+    }
+}
+
+
+void MainWindow::on_btn_next_simplex_second_released()
+{
+    if(simplex.possible_basis().size() > 0)
+    {
+        x1 += restriction_num + 3;
+
+        simplex.next_simplex_matrix(current_basis.first, current_basis.second);
+
+        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+        int t = current_matrix_column[current_basis.first];
+
+        current_matrix_column[current_basis.first] = current_matrix_row[current_basis.second];
+
+        current_matrix_row[current_basis.second] = t;
+
+
+        cout_matrix_header_second_table();
+
+
+        for(int i = 0; i < current_matrix.size() ; i++)
+        {
+            for(int j = 0; j < current_matrix[i].size(); j++)
+            {
+                //Заполняем матрицу
+                ui->simplex_second_table->setItem(i+ x1 + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
+                //Выделяем все возможные базисы
+                select_basis_main(i, j);
+            }
+        }
+        num_iter_main++;
+    }
+    if(check_simplex_end())
+    {
+        string res_x = "x = ( ";
+        string res_f = "f = ";
+        vector<Fractions> var_cur;
+        for(int i = 0; i < variables_num; i++)
+            var_cur.push_back(Fractions(0));
+        full_vec_var(var_cur);
+        for(auto i : var_cur)
+        {
+            res_x += (string) i + "; ";
+        }
+        res_x += ")";
+
+        Fractions counter(0);
+        for(int i = 0; i < variables_num; i++)
+        {
+            main_task[i] = main_task[i]*var_cur[i];
+            counter = counter + main_task[i];
+        }
+        res_f += (string) counter;
+
+        ui->cout_simplex_task_second->setText(QString::fromStdString(res_x + '\n' + res_f));
+
+    }
+    else if(check_simplex_error())
+    {
+        ui->btn_next_simplex_first->setEnabled(false);
+        ui->cout_simplex_task_second->setText(QString::fromStdString("Функция не ограничена. Решения нет!"));
+    }
+}
+
+
+void MainWindow::on_simplex_second_table_cellDoubleClicked(int row, int column)
+{
+    vector<pair<int, int>> all_basis = simplex.possible_basis_free();
+
+
+    pair<int, int> check_basis = {row-x-1, column-y-1};
+    if(all_basis.size()>0 && current_basis != check_basis)
+    {
+        if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
+        {
+            ui->simplex_second_table->item(row, column)->setBackgroundColor(QColor(0, 255, 0));
+
+            ui->simplex_second_table->item(current_basis.first + x1 + 1, current_basis.second + y + 1)->setBackgroundColor(QColor(255, 0, 0));
+
+            current_basis = check_basis;
+        }
     }
 }
 

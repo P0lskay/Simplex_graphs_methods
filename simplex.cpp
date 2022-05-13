@@ -73,11 +73,16 @@ vector<pair<int, int> > Simplex::possible_basis()
             vector<Fractions> this_column;
             for(int j = 0; j < index_last_row; j++)
             {
+                qDebug() << i << " " <<  j << " " << QString::fromStdString((string) last_matrix[j][i]);
                 if(last_matrix[j][i] > 0)
+                {
                     this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
+                    qDebug() << "OKAY " << QString::fromStdString((string) last_matrix[j][i]);
+                }
             }
             if(this_column.size()>0)
             {
+                qDebug() << i;
                 auto min_elem = *min_element(this_column.begin(), this_column.end());
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
