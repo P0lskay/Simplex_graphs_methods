@@ -93,6 +93,7 @@ vector<pair<int, int> > Simplex::possible_basis()
             }
         }
     }
+    qDebug() << "Ok";
     return result;
 }
 
@@ -184,7 +185,7 @@ void Simplex::start_main_matrix(vector<Fractions> task, Fractions free_k)
         qDebug() << i << " - " << QString::fromStdString((string) task[i]);
         last_matrix[last_matrix.size()-1][i] = task[i];
     }
-        last_matrix[last_matrix.size()-1][last_matrix[last_matrix.size()-1].size()-1] = free_k;
+        last_matrix[last_matrix.size()-1][last_matrix[last_matrix.size()-1].size()-1] = Fractions(-1) * free_k;
     all_matrix.push(Simplex_matrix(last_matrix));
 }
 

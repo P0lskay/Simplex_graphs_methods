@@ -243,6 +243,7 @@ bool MainWindow::check_simplex_error()
     return result;
 }
 
+
 void MainWindow::refrsh_main_task()
 {
     vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
@@ -521,9 +522,12 @@ void MainWindow::on_btn_next_simplex_second_released()
             main_task[i] = main_task[i]*var_cur[i];
             counter = counter + main_task[i];
         }
+        counter = counter + main_task[main_task.size()-1];
+
         res_f += (string) counter;
 
         ui->cout_simplex_task_second->setText(QString::fromStdString(res_x + '\n' + res_f));
+
 
     }
     else if(check_simplex_error())
