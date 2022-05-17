@@ -222,11 +222,11 @@ bool MainWindow::check_simplex_error()
 
     bool result = false;
 
-    for(int i = 0; i < current_matrix[0].size() ; i++)
+    for(int i = 0; i < current_matrix[0].size() -1; i++)
     {
         for(int j = 0; j < current_matrix.size(); j++)
         {
-           if(current_matrix[j][i] < 0)
+           if(current_matrix[j][i] < 0 ||current_matrix[j][i] == 0 )
            {
                result = true;
            }
@@ -236,11 +236,11 @@ bool MainWindow::check_simplex_error()
                break;
            }
         }
+
         if(result)
             return result;
     }
 
-    return result;
 }
 
 
@@ -351,7 +351,6 @@ void MainWindow::select_basis_main(int row, int column)
     if(all_basis.size()>0)
     {
 
-        qDebug() << 2;
         current_basis = all_basis[0];
         if(std::find(all_basis.begin(), all_basis.end(), check_basis) != all_basis.end())
         {
@@ -368,7 +367,6 @@ void MainWindow::select_basis_main(int row, int column)
 void MainWindow::on_btn_next_simplex_first_released()
 {
     ui->btn_last_simplex_first->setEnabled(true);
-
     //Проверяем базисы искусственных переменных
     if(simplex.possible_basis_free().size() > 0)
     {
@@ -429,8 +427,11 @@ void MainWindow::on_btn_next_simplex_first_released()
         }
         num_iter++;
     }
+
+    qDebug() << "1";
     if(check_simplex_end())
     {
+        qDebug() << "On";
         ui->btn_next_simplex_first->setEnabled(false);
         refrsh_main_task();
         string res_cout = "f* = ";
@@ -452,6 +453,7 @@ void MainWindow::on_btn_next_simplex_first_released()
 
         start_main_task();
 
+        qDebug() << "Off";
     }
     else if(check_simplex_error())
     {

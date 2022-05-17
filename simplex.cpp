@@ -67,33 +67,41 @@ vector<pair<int, int> > Simplex::possible_basis()
     //Перебираем все колонки в поисках отрицательного элемента на последней строке
     for(int i = 0; i < last_matrix[index_last_row].size()-1; i++)
     {
+        qDebug() <<"1 - " << i << " - " << last_matrix[index_last_row].size()-1;
         if(last_matrix[index_last_row][i] < 0)
         {
             //Собираем все Bi/Xi текущего столбца и находим там неотрицательный минимум
             vector<Fractions> this_column;
             for(int j = 0; j < index_last_row; j++)
             {
-                qDebug() << i << " " <<  j << " " << QString::fromStdString((string) last_matrix[j][i]);
+                qDebug() <<"2 - " << i << " - " << j << " - " << index_last_row;
                 if(last_matrix[j][i] > 0)
                 {
                     this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
-                    qDebug() << "OKAY " << QString::fromStdString((string) last_matrix[j][i]);
                 }
             }
             if(this_column.size()>0)
             {
-                qDebug() << i;
-                auto min_elem = *min_element(this_column.begin(), this_column.end());
+                for(auto i : this_column){
+                    qDebug() << QString::fromStdString((string) i);
+                }
+                auto min_elem = this_column[0];
+                for(auto i : this_column)
+                {
+                    if(i < min_elem)
+                        min_elem = i;
+                }
+                qDebug() << "3.1";
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
                 {
+                    qDebug() << "3 - " << i << " - " << j << " - " << index_last_row;
                     if(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem)
                         result.push_back({j, i});
                 }
             }
         }
     }
-    qDebug() << "Ok";
     return result;
 }
 
@@ -182,7 +190,6 @@ void Simplex::start_main_matrix(vector<Fractions> task, Fractions free_k)
 
     for(int i = 0; i < last_matrix[last_matrix.size()-1].size()-1; i++)
     {
-        qDebug() << i << " - " << QString::fromStdString((string) task[i]);
         last_matrix[last_matrix.size()-1][i] = task[i];
     }
         last_matrix[last_matrix.size()-1][last_matrix[last_matrix.size()-1].size()-1] = Fractions(-1) * free_k;
