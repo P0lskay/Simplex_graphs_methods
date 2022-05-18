@@ -85,7 +85,7 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
         }
     }
 }
-//При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
+//При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода и Графического метода
 void MainWindow::on_btn_send_into_data_released()
 {
 
@@ -127,7 +127,7 @@ void MainWindow::on_btn_send_into_data_released()
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
-
+        start_graph_method();
         start_simplex();
 
     }  catch (exception ex) {
@@ -281,6 +281,14 @@ void MainWindow::start_simplex()
     }
     num_iter++;
 }
+
+
+void MainWindow::start_graph_method()
+{
+    //graph = *new Graph(restrictions_matrix, true , common_fractions);
+
+}
+
 
 void MainWindow::full_vec_var(vector<Fractions> &vec)
 {

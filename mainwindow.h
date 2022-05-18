@@ -9,6 +9,7 @@
 #include <algorithm>
 #include <QColor>
 #include "simplex.h"
+#include "graph.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -21,7 +22,6 @@ class MainWindow : public QMainWindow
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
-    Simplex simplex= *new Simplex();\
 
 
 private slots:
@@ -44,6 +44,8 @@ private slots:
     void on_simplex_second_table_cellDoubleClicked(int row, int column);
 
 private:
+    Simplex simplex= *new Simplex();
+    Graph graph = *new Graph();
     bool common_fractions;
     int num_iter = 0; //Номер итерации вспомогательной задачи
     int num_iter_main = 0; //Номер итерации исходной задачи
@@ -86,6 +88,10 @@ private:
     void start_simplex();
 
     void full_vec_var(vector<Fractions>& vec);
+
+    //Метод отвечающий за начало вычислений графическим методом
+    void start_graph_method();
+
 
     Ui::MainWindow *ui;
 

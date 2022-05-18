@@ -1,6 +1,6 @@
 QT       += core gui
 
-greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+greaterThan(QT_MAJOR_VERSION, 4): QT += widgets printsupport
 
 CONFIG += c++11
 # You can make your code fail to compile if it uses deprecated APIs.
@@ -9,13 +9,17 @@ CONFIG += c++11
 
 SOURCES += \
     fractions.cpp \
+    graph.cpp \
     main.cpp \
     mainwindow.cpp \
+    qcustomplot.cpp \
     simplex.cpp
 
 HEADERS += \
     fractions.h \
+    graph.h \
     mainwindow.h \
+    qcustomplot.h \
     simplex.h
 
 FORMS += \
@@ -25,3 +29,5 @@ FORMS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+DISTFILES +=
