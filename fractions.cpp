@@ -45,6 +45,11 @@ void Fractions::simpler_Fractions(Fractions& Fraction)
             Fraction.fraction.first *= -1;
 }
 
+Fractions Fractions::absFraction(Fractions f)
+{
+    return Fractions(abs(f.getFraction().first), abs(f.getFraction().second));
+}
+
 Fractions Fractions::operator +(Fractions& rhs)
 {
     Fractions result(this->fraction.first * rhs.fraction.second + rhs.fraction.first * this->fraction.second, this->fraction.second * rhs.fraction.second);

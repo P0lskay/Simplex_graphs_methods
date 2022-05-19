@@ -127,6 +127,7 @@ void MainWindow::on_btn_send_into_data_released()
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
+        graph_main_task = main_task;
         start_graph_method();
         start_simplex();
 
@@ -246,19 +247,29 @@ bool MainWindow::check_simplex_error()
 
 void MainWindow::refrsh_main_task()
 {
+    //Получаем последнюю матрицу
     vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
 
     for(int i = 0; i < current_matrix.size()-1; i++)
     {
         for(int j = 0; j < current_matrix[i].size()-1; j++)
         {
+            //В главной задаче из j переменной вычитаем i переменную умноженную на коэффициент в уравнении i j
             auto t = main_task[current_matrix_column[i]-1] * current_matrix[i][j];
             main_task[current_matrix_row[j]-1] = main_task[current_matrix_row[j]-1] - t;
         }
+        //последний элемент в уравнении знак не меняем, поэтому делаем тоже самое, но с +
         auto t = main_task[current_matrix_column[i]-1] * current_matrix[i][current_matrix[i].size()-1];
         main_task[main_task.size()-1] = main_task[main_task.size()-1] + t;
+        //Уничтожаем в главной задаче текущую переменную
         main_task[current_matrix_column[i]-1] = Fractions(0);
     }
+}
+
+void MainWindow::refresh_graph_main_task(vector<vector<Fractions>> current_matrix)
+{
+
+
 }
 
 void MainWindow::start_simplex()
@@ -285,8 +296,15 @@ void MainWindow::start_simplex()
 
 void MainWindow::start_graph_method()
 {
-    //graph = *new Graph(restrictions_matrix, true , common_fractions);
+    //Создаем матрицу для графического метода
+    graph = *new Graph(restrictions_matrix, true , common_fractions);
 
+    if(graph.getTask_is_true())
+    {
+    vector<vector<Fractions>> equation = graph.getRestrictions();
+
+    for()
+    }
 }
 
 
@@ -436,10 +454,8 @@ void MainWindow::on_btn_next_simplex_first_released()
         num_iter++;
     }
 
-    qDebug() << "1";
     if(check_simplex_end())
     {
-        qDebug() << "On";
         ui->btn_next_simplex_first->setEnabled(false);
         refrsh_main_task();
         string res_cout = "f* = ";

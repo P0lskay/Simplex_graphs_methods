@@ -18,6 +18,8 @@ public:
     //Метод отвечающий за упрощение дроби
     void simpler_Fractions(Fractions& Fraction);
 
+    Fractions absFraction();
+
     Fractions operator +(Fractions& rhs);
     Fractions operator -(Fractions& rhs);
     Fractions operator *(Fractions& rhs);

@@ -68,6 +68,7 @@ private:
     //Вектора, хранящие значения переменных для основной задачи и для ограничений соответсвенно
     //Они будут отправляться в класс с симплекс методом и графическим методом
     vector<Fractions> main_task;
+    vector<Fractions> graph_main_task;
     vector<vector<int>> restrictions_matrix;
 
     //Выделяет базис в координатах row, column
@@ -84,6 +85,7 @@ private:
     bool check_simplex_error();
     //Метод обновляющий главную задачу после решения вспомогательной задачи
     void refrsh_main_task();
+    void refresh_graph_main_task(vector<vector<Fractions>> vec);
 
     void start_simplex();
 
