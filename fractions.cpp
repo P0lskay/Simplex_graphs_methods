@@ -2,6 +2,19 @@
 
 static bool common_fractions = true;
 
+
+
+//АЛГОРИТМ ЕВКЛИДА
+int gcd(int a, int b) {
+  int t;
+  while (b != 0) {
+    t = b;
+    b = a % b;
+    a = t;
+  }
+  return a;
+}
+
 const pair<int, int>& Fractions::getFraction() const
 {
     return fraction;
@@ -31,24 +44,20 @@ void Fractions::simpler_Fractions(Fractions& Fraction)
             Fraction.fraction.second *= -1;
         }
 
-    for (int i = Fraction.fraction.first; i > 1; i--)
-    {
-        if (Fraction.fraction.first % i == 0 && Fraction.fraction.second % i == 0)
-        {
-            Fraction.fraction.first /= i;
-            Fraction.fraction.second /= i;
-            break;
-        }
-    }
+         int mod = gcd(Fraction.fraction.first, Fraction.fraction.second);
+         Fraction.fraction.first /= mod;
+         Fraction.fraction.second /= mod;
 
         if(negative)
             Fraction.fraction.first *= -1;
 }
 
-Fractions Fractions::absFraction(Fractions f)
+Fractions Fractions::absFraction()
 {
-    return Fractions(abs(f.getFraction().first), abs(f.getFraction().second));
+    return Fractions(abs(this->fraction.first), abs(this->fraction.second));
 }
+
+
 
 Fractions Fractions::operator +(Fractions& rhs)
 {
@@ -79,6 +88,11 @@ Fractions Fractions::operator /(Fractions& rhs)
 }
 
 bool Fractions::operator ==(Fractions& rhs)
+{
+    return this->fraction.first == rhs.fraction.first && this->fraction.second == rhs.fraction.second;
+}
+
+bool Fractions::operator ==(const Fractions& rhs) const
 {
     return this->fraction.first == rhs.fraction.first && this->fraction.second == rhs.fraction.second;
 }

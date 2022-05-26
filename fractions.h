@@ -25,6 +25,7 @@ public:
     Fractions operator *(Fractions& rhs);
     Fractions operator /(Fractions& rhs);
     bool operator ==(Fractions& rhs);
+    bool operator ==(const Fractions& rhs) const;
     bool operator <(Fractions& rhs);
     bool operator <(const Fractions& rhs) const;
     bool operator <(int rhs);

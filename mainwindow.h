@@ -10,6 +10,7 @@
 #include <QColor>
 #include "simplex.h"
 #include "graph.h"
+#include "pointgraph.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }

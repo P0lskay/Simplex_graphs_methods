@@ -268,7 +268,18 @@ void MainWindow::refrsh_main_task()
 
 void MainWindow::refresh_graph_main_task(vector<vector<Fractions>> current_matrix)
 {
-
+    for(int i = 0; i < current_matrix.size()-1; i++)
+    {
+        for(int j = 0; j < current_matrix[i].size()-1; j++)
+        {
+            //В главной задаче из j переменной вычитаем i переменную умноженную на коэффициент в уравнении i j
+            auto t = graph_main_task[i] * current_matrix[i][j];
+            graph_main_task[j] = graph_main_task[j] - t;
+        }
+        auto t = graph_main_task[i] * current_matrix[i][current_matrix[i].size()-1];
+        graph_main_task[graph_main_task.size()-1] = graph_main_task[graph_main_task.size()-1] + t;
+        graph_main_task[i] = Fractions(0);
+    }
 
 }
 
@@ -301,10 +312,14 @@ void MainWindow::start_graph_method()
 
     if(graph.getTask_is_true())
     {
-    vector<vector<Fractions>> equation = graph.getRestrictions();
+        vector<vector<Fractions>> equation = graph.getRestrictions();
+        vector<PointGraph> points = graph.getNice_points();
 
-    for()
+        qDebug() << graph.getMaxX() << " " << graph.getMaxY();
+        ui->main_graph->xAxis->setRange(-5, graph.getMaxX());
+        ui->main_graph->xAxis->setRange(-5, graph.getMaxY());
     }
+
 }
 
 

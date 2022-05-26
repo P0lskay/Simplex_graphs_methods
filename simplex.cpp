@@ -67,14 +67,12 @@ vector<pair<int, int> > Simplex::possible_basis()
     //Перебираем все колонки в поисках отрицательного элемента на последней строке
     for(int i = 0; i < last_matrix[index_last_row].size()-1; i++)
     {
-        qDebug() <<"1 - " << i << " - " << last_matrix[index_last_row].size()-1;
         if(last_matrix[index_last_row][i] < 0)
         {
             //Собираем все Bi/Xi текущего столбца и находим там неотрицательный минимум
             vector<Fractions> this_column;
             for(int j = 0; j < index_last_row; j++)
             {
-                qDebug() <<"2 - " << i << " - " << j << " - " << index_last_row;
                 if(last_matrix[j][i] > 0)
                 {
                     this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
@@ -82,20 +80,16 @@ vector<pair<int, int> > Simplex::possible_basis()
             }
             if(this_column.size()>0)
             {
-                for(auto i : this_column){
-                    qDebug() << QString::fromStdString((string) i);
-                }
+
                 auto min_elem = this_column[0];
                 for(auto i : this_column)
                 {
                     if(i < min_elem)
                         min_elem = i;
                 }
-                qDebug() << "3.1";
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
                 {
-                    qDebug() << "3 - " << i << " - " << j << " - " << index_last_row;
                     if(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem)
                         result.push_back({j, i});
                 }

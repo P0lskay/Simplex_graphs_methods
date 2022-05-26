@@ -12,6 +12,7 @@ SOURCES += \
     graph.cpp \
     main.cpp \
     mainwindow.cpp \
+    pointgraph.cpp \
     qcustomplot.cpp \
     simplex.cpp
 
@@ -19,6 +20,7 @@ HEADERS += \
     fractions.h \
     graph.h \
     mainwindow.h \
+    pointgraph.h \
     qcustomplot.h \
     simplex.h
 

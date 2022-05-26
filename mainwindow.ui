@@ -1187,7 +1187,7 @@
      <attribute name="title">
       <string>Грфический метод</string>
      </attribute>
-     <widget class="QCustomPlot" name="widget" native="true">
+     <widget class="QCustomPlot" name="main_graph" native="true">
       <property name="geometry">
        <rect>
         <x>10</x>
