@@ -127,8 +127,8 @@ void MainWindow::on_btn_send_into_data_released()
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
-        graph_main_task = main_task;
-        start_graph_method();
+        //graph_main_task = main_task;
+       // start_graph_method();
         start_simplex();
 
     }  catch (exception ex) {
@@ -298,6 +298,7 @@ void MainWindow::start_simplex()
             //Заполняем матрицу
             ui->simplex_first_table->setItem(i+ x + 1, j+1, new QTableWidgetItem(QString::fromStdString((string) current_matrix[i][j])));
             //Выделяем все возможные базисы
+
             select_basis(i, j);
         }
     }
@@ -305,22 +306,22 @@ void MainWindow::start_simplex()
 }
 
 
-void MainWindow::start_graph_method()
-{
-    //Создаем матрицу для графического метода
-    graph = *new Graph(restrictions_matrix, true , common_fractions);
+//void MainWindow::start_graph_method()
+//{
+//    //Создаем матрицу для графического метода
+//    graph = *new Graph(restrictions_matrix, true , common_fractions);
 
-    if(graph.getTask_is_true())
-    {
-        vector<vector<Fractions>> equation = graph.getRestrictions();
-        vector<PointGraph> points = graph.getNice_points();
+//    if(graph.getTask_is_true())
+//    {
+//        vector<vector<Fractions>> equation = graph.getRestrictions();
+//        vector<PointGraph> points = graph.getNice_points();
 
-        qDebug() << graph.getMaxX() << " " << graph.getMaxY();
-        ui->main_graph->xAxis->setRange(-5, graph.getMaxX());
-        ui->main_graph->xAxis->setRange(-5, graph.getMaxY());
-    }
+//        qDebug() << graph.getMaxX() << " " << graph.getMaxY();
+//        ui->main_graph->xAxis->setRange(-5, graph.getMaxX());
+//        ui->main_graph->xAxis->setRange(-5, graph.getMaxY());
+//    }
 
-}
+//}
 
 
 void MainWindow::full_vec_var(vector<Fractions> &vec)
@@ -355,9 +356,11 @@ void MainWindow::on_simplex_first_table_cellDoubleClicked(int row, int column)
 
 void MainWindow::select_basis(int row, int column)
 {
+    qDebug() << "Начинаем";
     vector<pair<int, int>> all_basis = simplex.possible_basis_free();
     pair<int, int> check_basis = {row, column};
     //Если есть базис искусственных переменных, то выделяем только его, иначе все возможные базисы
+    qDebug() << "Пока все ок";
     if(all_basis.size()>0)
     {
         current_basis = all_basis[0];
@@ -370,6 +373,7 @@ void MainWindow::select_basis(int row, int column)
             ui->simplex_first_table->item(row + x + 1, column + y +1)->setBackgroundColor(QColor(0, 255, 0));
         }
     }
+
     else if(simplex.possible_basis().size() > 0)
     {
         all_basis = simplex.possible_basis();
@@ -383,6 +387,8 @@ void MainWindow::select_basis(int row, int column)
             ui->simplex_first_table->item(row + x + 1, column + y +1)->setBackgroundColor(QColor(0, 255, 0));
         }
     }
+
+    qDebug() << "Уже не ок";
 }
 
 void MainWindow::select_basis_main(int row, int column)
@@ -504,7 +510,26 @@ void MainWindow::on_btn_next_simplex_first_released()
 
 void MainWindow::on_btn_last_simplex_first_released()
 {
-    if(simplex.getSizeMatrixStack() < 2)
+    ui->cout_simplex_task_first->setText("");
+    ui->btn_next_simplex_first->setEnabled(true);
+
+    vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+    for(int i = 0; i < current_matrix.size()+1 ; i++)
+    {
+        for(int j = 0; j < current_matrix[i].size()+1; j++)
+        {
+            //Заполняем матрицу
+            ui->simplex_first_table->setItem(i+ x, j, new QTableWidgetItem(""));
+            ui->simplex_first_table->item(i+ x + 1, j+1)->setBackgroundColor(QColor(255, 255, 255));
+        }
+    }
+
+    simplex.del_last_matrix();
+
+    x-= restriction_num + 3;
+
+    if(simplex.getSizeMatrixStack() == 1)
     {
         ui->btn_last_simplex_first->setEnabled(false);
     }

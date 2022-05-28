@@ -9,8 +9,8 @@
 #include <algorithm>
 #include <QColor>
 #include "simplex.h"
-#include "graph.h"
-#include "pointgraph.h"
+//#include "graph.h"
+//#include "pointgraph.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -46,7 +46,7 @@ private slots:
 
 private:
     Simplex simplex= *new Simplex();
-    Graph graph = *new Graph();
+    //Graph graph = *new Graph();
     bool common_fractions;
     int num_iter = 0; //Номер итерации вспомогательной задачи
     int num_iter_main = 0; //Номер итерации исходной задачи

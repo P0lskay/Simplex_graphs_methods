@@ -47,6 +47,8 @@ public:
     void next_simplex_matrix(int x, int y);
 
     void start_main_matrix(vector<Fractions> task, Fractions free_k);
+
+    void del_last_matrix();
 };
 
 #endif // SIMPLEX_H

@@ -26,7 +26,7 @@ vector<pair<int, int>> Simplex::possible_basis_free()
 
     //Получаем последнюю матрицу, с которой и будем работать
     vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
-
+    qDebug() << "Начали";
     int index_last_row = last_matrix.size()-1;
     //Перебираем все колонки в поисках отрицательного элемента на последней строке
     for(int i = 0; i < last_matrix[index_last_row].size()-1; i++)
@@ -37,12 +37,19 @@ vector<pair<int, int>> Simplex::possible_basis_free()
             vector<Fractions> this_column;
             for(int j = 0; j < index_last_row; j++)
             {
+                qDebug() << i << " " << j;
                 if(last_matrix[j][i] > 0 && find(free_var.begin(), free_var.end(), j) != free_var.end())
                     this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
             }
             if(this_column.size()>0)
             {
-                auto min_elem = *min_element(this_column.begin(), this_column.end());
+                qDebug() << "Ищем минимум";
+                auto min_elem = *this_column.begin();
+                for(auto k : this_column)
+                {
+                    if(k < min_elem) min_elem = k;
+                }
+                qDebug() << "Нашли минимум";
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
                 {
@@ -187,7 +194,24 @@ void Simplex::start_main_matrix(vector<Fractions> task, Fractions free_k)
         last_matrix[last_matrix.size()-1][i] = task[i];
     }
         last_matrix[last_matrix.size()-1][last_matrix[last_matrix.size()-1].size()-1] = Fractions(-1) * free_k;
-    all_matrix.push(Simplex_matrix(last_matrix));
+        all_matrix.push(Simplex_matrix(last_matrix));
+}
+
+void Simplex::del_last_matrix()
+{
+    vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
+    all_matrix.pop();
+    vector<vector<Fractions>> pre_last_matrix = all_matrix.top().getRestirctions_matrix();
+
+    if(last_matrix.size() > 0 && pre_last_matrix.size() > 0 && pre_last_matrix[0].size() == last_matrix[0].size())
+    {
+        qDebug() << "SIZE == SIZE";
+    }
+    else
+    {
+        free_var.push_back(deleted_free_var.top());
+        deleted_free_var.pop();
+    }
 }
 
 
