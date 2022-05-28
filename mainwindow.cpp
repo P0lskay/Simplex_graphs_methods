@@ -356,11 +356,8 @@ void MainWindow::on_simplex_first_table_cellDoubleClicked(int row, int column)
 
 void MainWindow::select_basis(int row, int column)
 {
-    qDebug() << "Начинаем";
     vector<pair<int, int>> all_basis = simplex.possible_basis_free();
     pair<int, int> check_basis = {row, column};
-    //Если есть базис искусственных переменных, то выделяем только его, иначе все возможные базисы
-    qDebug() << "Пока все ок";
     if(all_basis.size()>0)
     {
         current_basis = all_basis[0];
@@ -388,7 +385,6 @@ void MainWindow::select_basis(int row, int column)
         }
     }
 
-    qDebug() << "Уже не ок";
 }
 
 void MainWindow::select_basis_main(int row, int column)
@@ -513,21 +509,39 @@ void MainWindow::on_btn_last_simplex_first_released()
     ui->cout_simplex_task_first->setText("");
     ui->btn_next_simplex_first->setEnabled(true);
 
+    qDebug() << "Начало";
     vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+    qDebug() << "Продолжаем";
 
     for(int i = 0; i < current_matrix.size()+1 ; i++)
     {
-        for(int j = 0; j < current_matrix[i].size()+1; j++)
+        for(int j = 0; j < current_matrix[0].size()+1; j++)
         {
             //Заполняем матрицу
+            qDebug() << i << " " << j;
             ui->simplex_first_table->setItem(i+ x, j, new QTableWidgetItem(""));
-            ui->simplex_first_table->item(i+ x + 1, j+1)->setBackgroundColor(QColor(255, 255, 255));
+            ui->simplex_first_table->item(i+ x, j)->setBackgroundColor(QColor(255, 255, 255));
         }
     }
-
+qDebug() << "Прогресс";
     simplex.del_last_matrix();
 
     x-= restriction_num + 3;
+    qDebug() << "Регресс";
+
+    current_matrix = simplex.getLast_matrix();
+
+    for(int i = 0; i < current_matrix.size() ; i++)
+    {
+        for(int j = 0; j < current_matrix[i].size(); j++)
+        {
+            ui->simplex_first_table->item(i+ x + 1, j+1)->setBackgroundColor(QColor(255, 255, 255));
+            //Выделяем все возможные базисы
+            select_basis(i, j);
+        }
+    }
+    num_iter--;
 
     if(simplex.getSizeMatrixStack() == 1)
     {

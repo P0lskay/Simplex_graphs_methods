@@ -26,7 +26,6 @@ vector<pair<int, int>> Simplex::possible_basis_free()
 
     //Получаем последнюю матрицу, с которой и будем работать
     vector<vector<Fractions>> last_matrix = all_matrix.top().getRestirctions_matrix();
-    qDebug() << "Начали";
     int index_last_row = last_matrix.size()-1;
     //Перебираем все колонки в поисках отрицательного элемента на последней строке
     for(int i = 0; i < last_matrix[index_last_row].size()-1; i++)
@@ -37,19 +36,16 @@ vector<pair<int, int>> Simplex::possible_basis_free()
             vector<Fractions> this_column;
             for(int j = 0; j < index_last_row; j++)
             {
-                qDebug() << i << " " << j;
                 if(last_matrix[j][i] > 0 && find(free_var.begin(), free_var.end(), j) != free_var.end())
                     this_column.push_back(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i]);
             }
             if(this_column.size()>0)
             {
-                qDebug() << "Ищем минимум";
                 auto min_elem = *this_column.begin();
                 for(auto k : this_column)
                 {
                     if(k < min_elem) min_elem = k;
                 }
-                qDebug() << "Нашли минимум";
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
                 {
