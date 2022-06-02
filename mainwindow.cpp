@@ -406,6 +406,44 @@ void MainWindow::select_basis_main(int row, int column)
     }
 }
 
+void MainWindow::set_new_headers()
+{
+    //считаем заголовки с текущей матрицы, затем переведем их в числа и обновим вектора
+    current_matrix_column.clear();
+    current_matrix_row.clear();
+
+    qDebug() << "Начало";
+    auto current_matrix = simplex.getLast_matrix();
+    if(current_matrix.size() > 0)
+    {
+        for(int i = y+1, j = 0; j < current_matrix[0].size()-1; i++, j++)
+        {
+            qDebug() << i << " " << j << " " << current_matrix[0].size()-1;
+            QString header = ui->simplex_first_table->item(x, i)->text();
+            header = header.right(header.size()-2);
+            header = header.left(header.size()-1);
+            int num = header.toInt();
+            qDebug() << header << " " << num;
+            current_matrix_row.push_back(num);
+        }
+    }
+    qDebug() << "1 раз";
+
+
+        for(int i = x + 1, j = 0; j <current_matrix.size()-1; i++, j++)
+        {
+            qDebug() << i << " " << j << " " << current_matrix.size()-1;
+            QString header = ui->simplex_first_table->item(i, y)->text();
+            header = header.right(header.size()-2);
+            header = header.left(header.size()-1);
+            int num = header.toInt();
+            current_matrix_column.push_back(num);
+            qDebug() << header << " " << num;
+        }
+
+    qDebug() << "OK";
+}
+
 
 void MainWindow::on_btn_next_simplex_first_released()
 {
@@ -509,27 +547,25 @@ void MainWindow::on_btn_last_simplex_first_released()
     ui->cout_simplex_task_first->setText("");
     ui->btn_next_simplex_first->setEnabled(true);
 
-    qDebug() << "Начало";
     vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
 
-    qDebug() << "Продолжаем";
 
     for(int i = 0; i < current_matrix.size()+1 ; i++)
     {
         for(int j = 0; j < current_matrix[0].size()+1; j++)
         {
             //Заполняем матрицу
-            qDebug() << i << " " << j;
             ui->simplex_first_table->setItem(i+ x, j, new QTableWidgetItem(""));
             ui->simplex_first_table->item(i+ x, j)->setBackgroundColor(QColor(255, 255, 255));
         }
     }
-qDebug() << "Прогресс";
     simplex.del_last_matrix();
 
     x-= restriction_num + 3;
-    qDebug() << "Регресс";
 
+    //Обновляем вектор с заголовками
+    set_new_headers();
+    qDebug() << "OK";
     current_matrix = simplex.getLast_matrix();
 
     for(int i = 0; i < current_matrix.size() ; i++)
@@ -541,6 +577,7 @@ qDebug() << "Прогресс";
             select_basis(i, j);
         }
     }
+    qDebug() << "OKOK";
     num_iter--;
 
     if(simplex.getSizeMatrixStack() == 1)
@@ -634,6 +671,15 @@ void MainWindow::on_simplex_second_table_cellDoubleClicked(int row, int column)
 
             current_basis = check_basis;
         }
+    }
+}
+
+
+void MainWindow::on_pushButton_released()
+{
+    while(ui->btn_next_simplex_first->isEnabled())
+    {
+        this->on_btn_next_simplex_first_released();
     }
 }
 

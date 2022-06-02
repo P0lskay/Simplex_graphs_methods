@@ -44,6 +44,8 @@ private slots:
 
     void on_simplex_second_table_cellDoubleClicked(int row, int column);
 
+    void on_pushButton_released();
+
 private:
     Simplex simplex= *new Simplex();
     //Graph graph = *new Graph();
@@ -75,6 +77,8 @@ private:
     //Выделяет базис в координатах row, column
     void select_basis(int row, int column);
     void select_basis_main(int row, int column);
+    //Обновление векторов, которые хранят заголовки матриц
+    void set_new_headers();
     //Вывод заголовка текущей матрицы для вспомогательной задачи
     void cout_matrix_header_first_table() const;
     void cout_matrix_header_second_table() const;
