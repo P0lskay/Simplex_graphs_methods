@@ -11,6 +11,7 @@ class Fractions
     pair<int, int> fraction;
 
 public:
+    Fractions();
     explicit Fractions(int x, int y = 1);
 
     const pair<int, int> &getFraction() const;

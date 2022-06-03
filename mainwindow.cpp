@@ -127,8 +127,8 @@ void MainWindow::on_btn_send_into_data_released()
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
-        //graph_main_task = main_task;
-       // start_graph_method();
+        graph_main_task = main_task;
+        start_graph_method();
         start_simplex();
 
     }  catch (exception ex) {
@@ -306,22 +306,22 @@ void MainWindow::start_simplex()
 }
 
 
-//void MainWindow::start_graph_method()
-//{
-//    //Создаем матрицу для графического метода
-//    graph = *new Graph(restrictions_matrix, true , common_fractions);
+void MainWindow::start_graph_method()
+{
+    //Создаем матрицу для графического метода
+    graph = *new Graph(restrictions_matrix, true , common_fractions);
+    qDebug() << graph.getTask_is_true();
+    if(graph.getTask_is_true())
+    {
+        vector<vector<Fractions>> equation = graph.getRestrictions();
+        vector<PointGraph> points = graph.getNice_points();
 
-//    if(graph.getTask_is_true())
-//    {
-//        vector<vector<Fractions>> equation = graph.getRestrictions();
-//        vector<PointGraph> points = graph.getNice_points();
+        qDebug() << graph.getMaxX() << " " << graph.getMaxY();
+        ui->main_graph->xAxis->setRange(0, graph.getMaxX()+4);
+        ui->main_graph->xAxis->setRange(0, graph.getMaxY()+4);
+    }
 
-//        qDebug() << graph.getMaxX() << " " << graph.getMaxY();
-//        ui->main_graph->xAxis->setRange(-5, graph.getMaxX());
-//        ui->main_graph->xAxis->setRange(-5, graph.getMaxY());
-//    }
-
-//}
+}
 
 
 void MainWindow::full_vec_var(vector<Fractions> &vec)
@@ -412,36 +412,28 @@ void MainWindow::set_new_headers()
     current_matrix_column.clear();
     current_matrix_row.clear();
 
-    qDebug() << "Начало";
     auto current_matrix = simplex.getLast_matrix();
     if(current_matrix.size() > 0)
     {
         for(int i = y+1, j = 0; j < current_matrix[0].size()-1; i++, j++)
         {
-            qDebug() << i << " " << j << " " << current_matrix[0].size()-1;
             QString header = ui->simplex_first_table->item(x, i)->text();
             header = header.right(header.size()-2);
             header = header.left(header.size()-1);
             int num = header.toInt();
-            qDebug() << header << " " << num;
             current_matrix_row.push_back(num);
         }
     }
-    qDebug() << "1 раз";
 
 
         for(int i = x + 1, j = 0; j <current_matrix.size()-1; i++, j++)
         {
-            qDebug() << i << " " << j << " " << current_matrix.size()-1;
             QString header = ui->simplex_first_table->item(i, y)->text();
             header = header.right(header.size()-2);
             header = header.left(header.size()-1);
             int num = header.toInt();
             current_matrix_column.push_back(num);
-            qDebug() << header << " " << num;
         }
-
-    qDebug() << "OK";
 }
 
 

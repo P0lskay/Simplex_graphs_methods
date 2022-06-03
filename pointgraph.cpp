@@ -8,19 +8,19 @@ PointGraph::PointGraph()
 
 PointGraph::PointGraph(Fractions x, Fractions y, vector<Fractions> equation1, vector<Fractions> equation2)
 {
-    point = {&x, &y};
+    point = {x, y};
     first_equation = equation1;
     second_equation = equation2;
 }
 
 Fractions PointGraph::getX() const
 {
-    return *point.first;
+    return point.first;
 }
 
 Fractions PointGraph::getY() const
 {
-    return *point.second;
+    return point.second;
 }
 
 PointGraph *PointGraph::getFirst_neighbour() const

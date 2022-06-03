@@ -27,7 +27,7 @@ public:
     const vector<Fractions> &getSecond_equation() const;
 
 private:
-    pair<Fractions*, Fractions*> point;
+    pair<Fractions, Fractions> point;
     PointGraph* first_neighbour = NULL;
     PointGraph* second_neigbour = NULL;
     vector<Fractions> first_equation;

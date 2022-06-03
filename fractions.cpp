@@ -142,6 +142,11 @@ void Fractions::setCommon_fractions(bool newCommon_fractions)
     common_fractions = newCommon_fractions;
 }
 
+Fractions::Fractions()
+{
+
+}
+
 Fractions::Fractions(int x, int y)
 {
     fraction = { x, y };
