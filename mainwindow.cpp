@@ -310,15 +310,30 @@ void MainWindow::start_graph_method()
 {
     //Создаем матрицу для графического метода
     graph = *new Graph(restrictions_matrix, true , common_fractions);
-    qDebug() << graph.getTask_is_true();
     if(graph.getTask_is_true())
     {
         vector<vector<Fractions>> equation = graph.getRestrictions();
         vector<PointGraph> points = graph.getNice_points();
+        ui->main_graph->addGraph();
+        //ui->main_graph->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20)));
+         ui->main_graph->graph(0)->setPen(QPen(Qt::blue));
 
-        qDebug() << graph.getMaxX() << " " << graph.getMaxY();
         ui->main_graph->xAxis->setRange(0, graph.getMaxX()+4);
         ui->main_graph->xAxis->setRange(0, graph.getMaxY()+4);
+
+        QVector<double> x(points.size()), y(points.size());
+
+        for(int i = 0; i < points.size(); i++)
+        {
+            qDebug() << points[i].getX().getFraction().first / points[i].getX().getFraction().second;
+            x[i] = points[i].getX().getFraction().first / points[i].getX().getFraction().second;
+            y[i] = points[i].getY().getFraction().first / points[i].getY().getFraction().second;
+        }
+        qDebug() << x.size() << " " << y.size();
+        QCPCurve *newCurve = new QCPCurve(ui->main_graph->xAxis, ui->main_graph->yAxis);
+        newCurve->setData(x, y);
+        newCurve->setBrush(QBrush(QColor(0, 0, 255, 20)));
+        ui->main_graph->replot();
     }
 
 }
