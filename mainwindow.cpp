@@ -329,10 +329,15 @@ void MainWindow::start_graph_method()
             x[i] = points[i].getX().getFraction().first / points[i].getX().getFraction().second;
             y[i] = points[i].getY().getFraction().first / points[i].getY().getFraction().second;
         }
+        x.push_back(x[0]);
+        y.push_back(y[0]);
         qDebug() << x.size() << " " << y.size();
-        QCPCurve *newCurve = new QCPCurve(ui->main_graph->xAxis, ui->main_graph->yAxis);
+        QCPGraph *newCurve = new QCPGraph(ui->main_graph->xAxis, ui->main_graph->yAxis);
         newCurve->setData(x, y);
         newCurve->setBrush(QBrush(QColor(0, 0, 255, 20)));
+        newCurve->setAdaptiveSampling(false);
+        newCurve->setScatterStyle(QCPScatterStyle::ssCircle);
+        newCurve->setPen(QPen(QBrush(Qt::red), 2));
         ui->main_graph->replot();
     }
 

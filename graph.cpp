@@ -127,9 +127,9 @@ void Graph::generate_equaions()
     {
         for(int j = restrictions.size(); j < restrictions[i].size()-1; j++)
         {
-            equations[i].push_back(Fractions(-1) * restrictions[i][j]);
+            equations[i].push_back(restrictions[i][j]);
         }
-        equations[i].push_back(restrictions[i][restrictions[i].size()-1]);
+        equations[i].push_back( restrictions[i][restrictions[i].size()-1]);
         qDebug() << QString::fromStdString((string) equations[i][0]) << " " <<  QString::fromStdString((string) equations[i][1]) <<" " << QString::fromStdString((string) equations[i][2]);
     }
 
