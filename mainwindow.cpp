@@ -325,9 +325,9 @@ void MainWindow::start_graph_method()
 
         for(int i = 0; i < points.size(); i++)
         {
-            qDebug() << points[i].getX().getFraction().first / points[i].getX().getFraction().second;
-            x[i] = points[i].getX().getFraction().first / points[i].getX().getFraction().second;
-            y[i] = points[i].getY().getFraction().first / points[i].getY().getFraction().second;
+            qDebug() << static_cast<double>(points[i].getX().getFraction().first) / static_cast<double>(points[i].getX().getFraction().second);
+            x[i] = static_cast<double>(points[i].getX().getFraction().first) / static_cast<double>(points[i].getX().getFraction().second);
+            y[i] = static_cast<double>(points[i].getY().getFraction().first) / static_cast<double>(points[i].getY().getFraction().second);
         }
         x.push_back(x[0]);
         y.push_back(y[0]);

@@ -150,24 +150,25 @@ void Graph::generate_points()
                          QString::fromStdString((string)equations[i][1]) << " " << QString::fromStdString((string)equations[j][1]) << endl <<
                          QString::fromStdString((string)equations[i][2]) << " " << QString::fromStdString((string)equations[j][2]) << endl;
             PointGraph newPoint;
-            if(i != j && !((equations[i][0] == equations[j][0]) || (equations[i][1] == equations[j][1])) &&
+            if(i != j && !((equations[i][0] == equations[j][0]) && (equations[i][1] == equations[j][1])) &&
                     !(Fractions(0) == equations[i][0] && Fractions(0) == equations[i][1]) && !(Fractions(0) == equations[j][0] && Fractions(0) == equations[j][1]))
             {
                 if(Fractions(0) == equations[i][0] && Fractions(0) == equations[j][1] )
                 {
-                    newPoint = PointGraph((Fractions(-1) * equations[j][2]) /equations[j][0], (Fractions(-1) * equations[i][2]) /equations[i][1], equations[i], equations[j]);
+                    newPoint = PointGraph( equations[j][2] /equations[j][0],  equations[i][2]/equations[i][1], equations[i], equations[j]);
                     qDebug() << 1;
                 }
                 else if(Fractions(0) == equations[i][1] && Fractions(0) == equations[j][0] )
                 {
-                    newPoint = PointGraph((Fractions(-1) * equations[i][2]) /equations[i][0], (Fractions(-1) * equations[j][2]) /equations[j][1], equations[i], equations[j]);
+                    newPoint = PointGraph(equations[i][2] /equations[i][0], equations[j][2] /equations[j][1], equations[i], equations[j]);
                     qDebug() << 2;
                 }
                 else if(Fractions(0) == equations[i][0])
                 {
-                    Fractions y = (Fractions(-1) * equations[i][2])/equations[i][1];
-                    Fractions x = Fractions(-1) * equations[j][2];
-                    x = x - y;
+                    Fractions y = (equations[i][2])/equations[i][1];
+                    Fractions x =  equations[j][2];
+                    Fractions t = y * equations[j][1];
+                    x = x - t;
                     x = x/equations[j][0];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
                     qDebug() << 3;
@@ -175,9 +176,10 @@ void Graph::generate_points()
                 }
                 else if (Fractions(0) == equations[i][1])
                 {
-                    Fractions x = Fractions(-1)*equations[i][2]/equations[i][0];
-                    Fractions y = Fractions(-1)*equations[j][2];
-                    y = y - x;
+                    Fractions x = equations[i][2]/equations[i][0];
+                    Fractions y = equations[j][2];
+                    Fractions t = x * equations[j][0];
+                    y = y - t;
                     y = y / equations[j][1];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
                     qDebug() << 4;
@@ -185,9 +187,10 @@ void Graph::generate_points()
                 }
                 else if(Fractions(0) == equations[j][0])
                 {
-                    Fractions y = (Fractions(-1) * equations[j][2])/equations[j][1];
-                    Fractions x = Fractions(-1) * equations[i][2];
-                    x = x - y;
+                    Fractions y = (equations[j][2])/equations[j][1];
+                    Fractions x =  equations[i][2];
+                    Fractions t = y * equations[i][1];
+                    x = x - t;
                     x = x/equations[i][0];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
                     qDebug() << 5;
@@ -195,9 +198,10 @@ void Graph::generate_points()
                 }
                 else if (Fractions(0) == equations[j][1])
                 {
-                    Fractions x = Fractions(-1)*equations[j][2]/equations[j][0];
-                    Fractions y = Fractions(-1)*equations[i][2];
-                    y = y - x;
+                    Fractions x = equations[j][2]/equations[j][0];
+                    Fractions y = equations[i][2];
+                    Fractions t = x * equations[i][0];
+                    y = y - t;
                     y = y / equations[i][1];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
                     qDebug() << 6;
@@ -238,6 +242,12 @@ void Graph::generate_points()
             //Если результат меньше 0, значит точка не удовлетворяет одному из неравенств
             Fractions x = point.getX() * equation[0];
             Fractions y = point.getY() * equation[1];
+            if(!(equation[0] == Fractions(1) && equation[1]== Fractions(0) && equation[2] == Fractions(0)) &&
+                    !(equation[0] == Fractions(0) && equation[1]== Fractions(1) && equation[2] == Fractions(0)))
+            {
+                y = Fractions(-1) * y;
+                x = Fractions(-1) * x;
+            }
             Fractions t = x + y + equation[2];
             qDebug() << QString::fromStdString((string) point.getX()) << " " << QString::fromStdString((string) point.getY()) << endl <<
                         QString::fromStdString((string) equation[0]) << " " << QString::fromStdString((string) equation[1]) << " " << QString::fromStdString((string) equation[2]) << endl <<
