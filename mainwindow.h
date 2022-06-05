@@ -46,14 +46,21 @@ private slots:
 
     void on_pushButton_released();
 
+    void on_btn_send_into_data_2_released();
+
+    void on_restrictions_num_2_valueChanged(int arg1);
+
 private:
     Simplex simplex= *new Simplex();
     Graph graph = *new Graph();
     bool common_fractions;
+    bool min_task;
+    bool graph_min_task;
     int num_iter = 0; //Номер итерации вспомогательной задачи
     int num_iter_main = 0; //Номер итерации исходной задачи
     //Переменные хранящие кол-во ограничений и переменных
     int restriction_num = 0;
+    int graph_restriction_num = 0;
     int variables_num = 0;
     //Координаты в таблице искусственного симплекс метода
     int x = 0;
@@ -73,6 +80,7 @@ private:
     vector<Fractions> main_task;
     vector<Fractions> graph_main_task;
     vector<vector<int>> restrictions_matrix;
+    vector<vector<int>> graph_restrictions_matrix;
 
     //Выделяет базис в координатах row, column
     void select_basis(int row, int column);
@@ -98,6 +106,9 @@ private:
 
     //Метод отвечающий за начало вычислений графическим методом
     void start_graph_method();
+
+    vector<PointGraph> search_extr_points(vector<PointGraph> points);
+    Fractions search_extr_value(vector<PointGraph> points);
 
 
     Ui::MainWindow *ui;

@@ -26,22 +26,26 @@ public:
 
     int getMinY() const;
 
+    bool getUp_restrictions() const;
+
+    bool getRight_restrictions() const;
+
+    const vector<pair<PointGraph, PointGraph> > &getMain_points() const;
+
 private:
     vector<vector<Fractions>> restrictions;
     vector<vector<Fractions>> equations;
     vector<PointGraph> nice_points;
+    vector<pair<PointGraph, PointGraph>> main_points;
     int maxX;
     int maxY;
     int minX;
     int minY;
 
-    bool task_is_true = true;
-    //Метод гаусса
-    void Gauss();
+    bool up_restrictions = false;
+    bool right_restrictions = false;
 
-    //Генерация уравнений из матрицы
-    void generate_equaions();
-
+    void generate_main_points();
     void generate_points();
 };
 

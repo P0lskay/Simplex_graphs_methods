@@ -85,7 +85,36 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
         }
     }
 }
-//При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода и Графического метода
+
+void MainWindow::on_restrictions_num_2_valueChanged(int arg1)
+{
+    if(arg1 != graph_restriction_num)
+    {
+        graph_restriction_num = arg1;
+
+        ui->table_restrictions_data_2->setRowCount(graph_restriction_num);
+
+        for(int i = 0; i < graph_restriction_num; i++)
+        {
+            QString str = "f(x)" + QString::number(i+1);
+             ui->table_restrictions_data_2->setVerticalHeaderItem(i ,new QTableWidgetItem(str));
+        }
+
+        for(int i = 0; i < 3; i++)
+        {
+              ui->table_task_data->setItem(0, i, new QTableWidgetItem("0"));
+        }
+
+        for(int i = 0; i <3; i++)
+        {
+            for(int j = 0; j < graph_restriction_num; j++)
+              ui->table_restrictions_data_2->setItem(j, i, new QTableWidgetItem("0"));
+        }
+    }
+}
+
+
+//При нажатии на кнпоку нужно отправить данные на обработку в класс Симплекс метода
 void MainWindow::on_btn_send_into_data_released()
 {
 
@@ -127,9 +156,8 @@ void MainWindow::on_btn_send_into_data_released()
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
-        graph_main_task = main_task;
-        start_graph_method();
-        start_simplex();
+        //start_graph_method();
+        //start_simplex();
 
     }  catch (exception ex) {
         QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
@@ -137,6 +165,40 @@ void MainWindow::on_btn_send_into_data_released()
 
 
 }
+
+//Кнопка решения для графического метода
+void MainWindow::on_btn_send_into_data_2_released()
+{
+    QRegExp re("[-]*\\d*"); //Регулярное выражение для проверки на соответствие строки числу
+
+    try
+    {
+
+        for(int i = 0; i < 3; i++)
+        {
+            if(!re.exactMatch(ui->table_task_data_2->item(0, i)->text()))
+                throw exception();
+
+            graph_main_task.push_back(Fractions(ui->table_task_data_2->item(0, i)->text().toInt()));
+        }
+
+        for(int i = 0; i < graph_restriction_num; i++)
+        {
+            graph_restrictions_matrix.push_back({});
+            for(int j = 0; j < 3; j++)
+            {
+                if(!re.exactMatch(ui->table_restrictions_data_2->item(i, j)->text()))
+                    throw exception();
+                graph_restrictions_matrix[i].push_back(ui->table_restrictions_data_2->item(i, j)->text().toInt());
+            }
+        }
+        start_graph_method();
+
+    }  catch (exception ex) {
+        QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
+    }
+}
+
 
 void MainWindow::cout_matrix_header_first_table() const
 {
@@ -309,38 +371,79 @@ void MainWindow::start_simplex()
 void MainWindow::start_graph_method()
 {
     //Создаем матрицу для графического метода
-    graph = *new Graph(restrictions_matrix, true , common_fractions);
-    if(graph.getTask_is_true())
+    graph = *new Graph(graph_restrictions_matrix, true , common_fractions);
+    if(graph.getUp_restrictions() && graph.getRight_restrictions())
     {
         vector<vector<Fractions>> equation = graph.getRestrictions();
         vector<PointGraph> points = graph.getNice_points();
-        ui->main_graph->addGraph();
+        vector<pair<PointGraph, PointGraph>> main_points = graph.getMain_points();
+        //ui->main_graph->addGraph();
         //ui->main_graph->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20)));
-         ui->main_graph->graph(0)->setPen(QPen(Qt::blue));
+         //ui->main_graph->graph(0)->setPen(QPen(Qt::blue));
 
-        ui->main_graph->xAxis->setRange(0, graph.getMaxX()+4);
-        ui->main_graph->xAxis->setRange(0, graph.getMaxY()+4);
+        ui->main_graph->xAxis->setRange(0, 20);
+        ui->main_graph->xAxis->setRange(0, 20);
 
-        QVector<double> x(points.size()), y(points.size());
 
-        for(int i = 0; i < points.size(); i++)
+
+        for(int i = 0; i < main_points.size(); i++)
         {
+            QVector<double> x(2), y(2);
+            ui->main_graph->addGraph();
             qDebug() << static_cast<double>(points[i].getX().getFraction().first) / static_cast<double>(points[i].getX().getFraction().second);
-            x[i] = static_cast<double>(points[i].getX().getFraction().first) / static_cast<double>(points[i].getX().getFraction().second);
-            y[i] = static_cast<double>(points[i].getY().getFraction().first) / static_cast<double>(points[i].getY().getFraction().second);
+            x[0] = static_cast<double>(main_points[i].first.getX().getFraction().first) / static_cast<double>(main_points[i].first.getX().getFraction().second);
+            x[1] = static_cast<double>(main_points[i].second.getX().getFraction().first) / static_cast<double>(main_points[i].second.getX().getFraction().second);
+            y[0] = static_cast<double>(main_points[i].first.getY().getFraction().first) / static_cast<double>(main_points[i].first.getY().getFraction().second);
+            y[1] = static_cast<double>(main_points[i].second.getY().getFraction().first) / static_cast<double>(main_points[i].second.getY().getFraction().second);
+            ui->main_graph->graph(i)->setData(x, y);
+            ui->main_graph->graph(i)->setPen(QPen(Qt::blue));
         }
-        x.push_back(x[0]);
-        y.push_back(y[0]);
-        qDebug() << x.size() << " " << y.size();
-        QCPGraph *newCurve = new QCPGraph(ui->main_graph->xAxis, ui->main_graph->yAxis);
-        newCurve->setData(x, y);
-        newCurve->setBrush(QBrush(QColor(0, 0, 255, 20)));
-        newCurve->setAdaptiveSampling(false);
-        newCurve->setScatterStyle(QCPScatterStyle::ssCircle);
-        newCurve->setPen(QPen(QBrush(Qt::red), 2));
+//        x.push_back(x[0]);
+//        y.push_back(y[0]);
+//        qDebug() << x.size() << " " << y.size();
+//        QCPGraph *newCurve = new QCPGraph(ui->main_graph->xAxis, ui->main_graph->yAxis);
+//        newCurve->setData(x, y);
+//        newCurve->setBrush(QBrush(QColor(0, 0, 255, 20)));
+//        newCurve->setAdaptiveSampling(false);
+//        newCurve->setScatterStyle(QCPScatterStyle::ssCircle);
+//        newCurve->setPen(QPen(QBrush(Qt::red), 2));
         ui->main_graph->replot();
+
     }
 
+}
+
+vector<PointGraph> MainWindow::search_extr_points(vector<PointGraph> points)
+{
+    Fractions min_value = search_extr_value(points);
+    vector<PointGraph> min_points;
+
+    for(auto i : points)
+    {
+        Fractions t = i.getX() * graph_main_task[graph_main_task.size()-3];
+        t = i.getY() * graph_main_task[graph_main_task.size()-2] + t;
+        if(t == min_value)
+            min_points.push_back(i);
+    }
+
+    return min_points;
+}
+
+Fractions MainWindow::search_extr_value(vector<PointGraph> points)
+{
+    if(points.size() == 0)
+        return Fractions(0);
+    Fractions min_value = (points[0].getX() * graph_main_task[graph_main_task.size()-3]);
+    min_value = (points[0].getY() * graph_main_task[graph_main_task.size()-2]) + min_value;
+
+    for(auto i : points)
+    {
+        Fractions t = i.getX() * graph_main_task[graph_main_task.size()-3];
+        t = i.getY() * graph_main_task[graph_main_task.size()-2] + t;
+        if(t < min_value)
+            min_value = t;
+    }
+    return min_value;
 }
 
 
@@ -694,4 +797,9 @@ void MainWindow::on_pushButton_released()
         this->on_btn_next_simplex_first_released();
     }
 }
+
+
+
+
+
 

@@ -14,7 +14,8 @@ SOURCES += \
     mainwindow.cpp \
     pointgraph.cpp \
     qcustomplot.cpp \
-    simplex.cpp
+    simplex.cpp \
+    unused_methods.cpp
 
 HEADERS += \
     fractions.h \

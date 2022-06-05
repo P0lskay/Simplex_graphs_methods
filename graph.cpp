@@ -7,9 +7,16 @@ Graph::Graph()
 
 Graph::Graph(vector<vector<int> > matrix, bool min_task, bool comon_fractions)
 {
+    for(auto i : matrix)
+    {
+        if(i[0] != 0)
+            up_restrictions = true;
+        if(i[1] != 0)
+            right_restrictions = true;
+    }
+    qDebug() << up_restrictions << " " << right_restrictions;
+
     //Сначала нужно заполнить хранилище ограничений
-    //Затем нужно провести метод Гаусса
-    //Затем получит полученные уравнения с 2-мя переменными
     (new Fractions(1))->setCommon_fractions(comon_fractions);
     restrictions.resize(matrix.size());
     for(int i = 0; i < matrix.size(); i++)
@@ -19,20 +26,14 @@ Graph::Graph(vector<vector<int> > matrix, bool min_task, bool comon_fractions)
             restrictions[i].push_back(Fractions(matrix[i][j]));
         }
     }
-    if(matrix.size() > 0 && matrix[0].size() > 3)
-    {
-        this->Gauss();
-        this->generate_equaions();
-        this->generate_points();
-    }
-    else
-        task_is_true = false;
+    equations = restrictions;
+    equations.push_back({Fractions(0), Fractions(1), Fractions(0)});
+    equations.push_back({Fractions(1), Fractions(0), Fractions(0)});
+    this->generate_main_points();
+    this->generate_points();
 }
 
-bool Graph::getTask_is_true() const
-{
-    return task_is_true;
-}
+
 
 const vector<vector<Fractions> > &Graph::getRestrictions() const
 {
@@ -64,79 +65,44 @@ int Graph::getMinY() const
     return minY;
 }
 
-void Graph::Gauss()
+bool Graph::getUp_restrictions() const
 {
-    qDebug() << restrictions.size();
-    for(int row = 0; row < restrictions.size(); row++)
+    return up_restrictions;
+}
+
+bool Graph::getRight_restrictions() const
+{
+    return right_restrictions;
+}
+
+const vector<pair<PointGraph, PointGraph> > &Graph::getMain_points() const
+{
+    return main_points;
+}
+
+void Graph::generate_main_points()
+{
+    vector<Fractions> ordinate = {Fractions(0), Fractions(1), Fractions(0)};
+    vector<Fractions> abcisse = {Fractions(1), Fractions(0), Fractions(0)};
+    for(auto i : restrictions)
     {
-        int max_elem_column = -1;
-
-        for(int i = row; i < restrictions.size(); i++)
+        if(i[0] == Fractions(0) && i[1] == Fractions(0))
+            throw exception("Одно из ограничений нулевое");
+        else if(i[0] == Fractions(0))
         {
-            if((max_elem_column == -1 ||restrictions[max_elem_column][row].absFraction() < restrictions[i][row].absFraction()) && !(restrictions[i][row] == Fractions(0)))
-                max_elem_column = i;
+            main_points.push_back({PointGraph(Fractions(0), i[2]/i[1], ordinate, i), PointGraph(Fractions(100), i[2]/i[1], ordinate, i)});
         }
-        if(max_elem_column == -1)
+        else if(i[1] == Fractions(0))
         {
-            task_is_true = false;
-            break;
+            main_points.push_back({PointGraph(i[2]/i[0], Fractions(0), abcisse, i), PointGraph(i[2]/i[0], Fractions(100), abcisse, i)});
         }
-
-        if (max_elem_column != row)
+        else
         {
-            swap(restrictions[max_elem_column], restrictions[row]);
+            main_points.push_back({PointGraph(Fractions(0), i[2]/i[1], ordinate, i), PointGraph(i[2]/i[0], Fractions(0),  abcisse, i)});
         }
-        Fractions t = restrictions[row][row];
-        for (auto& a : restrictions[row])
-            {
-                a = a / t;
-            }
-        for (int j = row + 1; j < restrictions.size(); j++)
-        {
-            Fractions t = restrictions[j][row] / restrictions[row][row];
-            for (int i = 0; i < restrictions[row].size(); i++)
-                {
-                Fractions a = t * restrictions[row][i];
-                    restrictions[j][i] = restrictions[j][i] - a;
-                }
-        }
-
-        for(int j = row -1; j > -1; j--)
-        {
-            Fractions t = restrictions[j][row] / restrictions[row][row];
-            for(int i = 0; i < restrictions[row].size(); i++)
-            {
-                Fractions a = t * restrictions[row][i];
-                restrictions[j][i] = restrictions[j][i] - a;
-            }
-        }
-        qDebug() << "GAUSS";
-        for (auto& a : restrictions[row])
-            {
-                qDebug() << QString::fromStdString((string) a) << "-";
-            }
-
     }
 }
 
-void Graph::generate_equaions()
-{
-    //Заполняем уравнения для графа, все они по-умолчанию >= 0
-    equations.resize(restrictions.size());
-    for(int i = 0; i < restrictions.size(); i++)
-    {
-        for(int j = restrictions.size(); j < restrictions[i].size()-1; j++)
-        {
-            equations[i].push_back(restrictions[i][j]);
-        }
-        equations[i].push_back( restrictions[i][restrictions[i].size()-1]);
-        qDebug() << QString::fromStdString((string) equations[i][0]) << " " <<  QString::fromStdString((string) equations[i][1]) <<" " << QString::fromStdString((string) equations[i][2]);
-    }
-
-    //Добавляем к уравнениям оси Ox и Oy
-    equations.push_back({Fractions(1), Fractions(0), Fractions(0)});
-    equations.push_back({Fractions(0), Fractions(1), Fractions(0)});
-}
 
 void Graph::generate_points()
 {
