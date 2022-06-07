@@ -156,8 +156,7 @@ void MainWindow::on_btn_send_into_data_released()
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
-        //start_graph_method();
-        //start_simplex();
+        start_simplex();
 
     }  catch (exception ex) {
         QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
@@ -173,6 +172,11 @@ void MainWindow::on_btn_send_into_data_2_released()
 
     try
     {
+
+        if(ui->task_type_2->currentText() == "Максимизировать")
+            graph_min_task = false;
+        else
+            graph_min_task = true;
 
         for(int i = 0; i < 3; i++)
         {
@@ -372,7 +376,8 @@ void MainWindow::start_graph_method()
 {
     //Создаем матрицу для графического метода
     graph = *new Graph(graph_restrictions_matrix, true , common_fractions);
-    if(graph.getUp_restrictions() && graph.getRight_restrictions())
+    normal_building();
+    if(graph_right_task_ok && graph_up_task_ok)
     {
         vector<vector<Fractions>> equation = graph.getRestrictions();
         set<PointGraph> points = graph.getNice_points();
@@ -391,7 +396,9 @@ void MainWindow::start_graph_method()
 
         //Выводим линии графа и выделяем точки пересечения
         ui->main_graph->xAxis->setRange(0, graph.getMaxX()+4);
+        ui->main_graph->xAxis->setLabel("X1");
         ui->main_graph->yAxis->setRange(0, graph.getMaxY()+4);
+        ui->main_graph->yAxis->setLabel("X2");
 
 
 
@@ -424,40 +431,122 @@ void MainWindow::start_graph_method()
         ui->main_graph->replot();
 
     }
+    else
+    {
+        if(graph.getUp_restrictions())
+            ui->cout_graph_task->setText(QString::fromStdString("Функция неограничена справа"));
+        else if(graph.getRight_restrictions())
+            ui->cout_graph_task->setText(QString::fromStdString("Функция неограничена сверху"));
+        else
+            ui->cout_graph_task->setText(QString::fromStdString("Функция неограничена"));
+    }
+
+}
+
+void MainWindow::normal_building()
+{
+    QVector<double> x(2), y(2);
+    x[0] = 0;
+    y[0] = 0;
+    double x_finish_point, y_finish_point;
+    if(graph_min_task)
+    {
+        x_finish_point = static_cast<double>(graph_main_task[0].getFraction().first)/static_cast<double>(graph_main_task[0].getFraction().second) * -1;
+        y_finish_point = static_cast<double>(graph_main_task[1].getFraction().first)/static_cast<double>(graph_main_task[1].getFraction().second) * -1;
+    }
+    else
+    {
+        x_finish_point = static_cast<double>(graph_main_task[0].getFraction().first)/static_cast<double>(graph_main_task[0].getFraction().second);
+        y_finish_point = static_cast<double>(graph_main_task[1].getFraction().first)/static_cast<double>(graph_main_task[1].getFraction().second);
+    }
+    x[1] = x_finish_point;
+    y[1] = y_finish_point;
+
+    draw_normal(x, y);
+
+    if(y_finish_point > 0 && !graph.getUp_restrictions())
+    {
+        graph_up_task_ok = false;
+    }
+    if(x_finish_point > 0 && !graph.getRight_restrictions())
+    {
+        graph_right_task_ok = false;
+    }
+
+
+}
+
+void MainWindow::draw_normal(QVector<double> x, QVector<double> y)
+{
+    QCPItemLine *arrow = new QCPItemLine(ui->main_graph);
+    arrow->start->setCoords(x[0], y[0]);
+    arrow->end->setCoords(x[1], y[1]);
+    arrow->setHead(QCPLineEnding::esSpikeArrow);
+    arrow->setPen(QPen(QBrush(Qt::green), 2));
+
+    QVector<double> normal_x(2), normal_y(2);
+    if(y[1] > 0)
+    {
+        normal_x[0] = y[1] * -1;
+        normal_x[1] = y[1];
+        normal_y[0] = x[1];
+        normal_y[1] = x[1] * -1;
+    }
+    else
+    {
+        normal_x[0] = y[1];
+        normal_x[1] = y[1] * -1;
+        normal_y[0] = x[1] * -1;
+        normal_y[1] = x[1];
+    }
+    qDebug() << normal_x[0] << " " << normal_y[0] << endl << normal_x[1] << " " << normal_y[1];
+    QCPCurve *normal = new QCPCurve(ui->main_graph->xAxis, ui->main_graph->yAxis);
+
+    normal->setData(normal_x, normal_y);
+    normal->setLineStyle(QCPCurve::lsLine);
+    normal->setPen(QPen(QBrush(Qt::green), 2));
 
 }
 
 set<PointGraph> MainWindow::search_extr_points(set<PointGraph> points)
 {
-    Fractions min_value = search_extr_value(points);
-    set<PointGraph> min_points;
+    Fractions extremum_value = search_extr_value(points);
+    set<PointGraph> extremum_points;
 
     for(auto i : points)
     {
         Fractions t = i.getX() * graph_main_task[graph_main_task.size()-3];
         t = i.getY() * graph_main_task[graph_main_task.size()-2] + t;
-        if(t == min_value)
-            min_points.insert(i);
+        if(t == extremum_value)
+            extremum_points.insert(i);
     }
 
-    return min_points;
+    return extremum_points;
 }
 
 Fractions MainWindow::search_extr_value(set<PointGraph> points)
 {
     if(points.size() == 0)
         return Fractions(0);
-    Fractions min_value = (points.begin()->getX() * graph_main_task[graph_main_task.size()-3]);
-    min_value = (points.begin()->getY() * graph_main_task[graph_main_task.size()-2]) + min_value;
+    Fractions extremum_value = (points.begin()->getX() * graph_main_task[graph_main_task.size()-3]);
+    extremum_value = (points.begin()->getY() * graph_main_task[graph_main_task.size()-2]) + extremum_value;
 
     for(auto i : points)
     {
         Fractions t = i.getX() * graph_main_task[graph_main_task.size()-3];
         t = i.getY() * graph_main_task[graph_main_task.size()-2] + t;
-        if(t < min_value)
-            min_value = t;
+        if(graph_min_task)
+        {
+        if(t < extremum_value)
+            extremum_value = t;
+        }
+        else
+        {
+            if(extremum_value < t)
+                extremum_value = t;
+        }
     }
-    return min_value;
+    return extremum_value;
 }
 
 

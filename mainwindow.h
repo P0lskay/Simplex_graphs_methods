@@ -9,6 +9,7 @@
 #include <QDebug>
 #include <algorithm>
 #include <QColor>
+#include <QVector>
 #include "simplex.h"
 #include "graph.h"
 #include "pointgraph.h"
@@ -57,6 +58,8 @@ private:
     bool common_fractions;
     bool min_task;
     bool graph_min_task;
+    bool graph_up_task_ok = true;
+    bool graph_right_task_ok = true;
     int num_iter = 0; //Номер итерации вспомогательной задачи
     int num_iter_main = 0; //Номер итерации исходной задачи
     //Переменные хранящие кол-во ограничений и переменных
@@ -107,6 +110,12 @@ private:
 
     //Метод отвечающий за начало вычислений графическим методом
     void start_graph_method();
+
+    //Метод находящий координаты нормали и проверящий задачу на наличие решения
+    void normal_building();
+
+    //Метлж строющий нормаль
+    void draw_normal(QVector<double> x, QVector<double> y);
 
     set<PointGraph> search_extr_points(set<PointGraph> points);
     Fractions search_extr_value(set<PointGraph> points);

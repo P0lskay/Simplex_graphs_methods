@@ -14,7 +14,6 @@ Graph::Graph(vector<vector<int> > matrix, bool min_task, bool comon_fractions)
         if(i[1] != 0)
             right_restrictions = true;
     }
-    qDebug() << up_restrictions << " " << right_restrictions;
 
     //Сначала нужно заполнить хранилище ограничений
     (new Fractions(1))->setCommon_fractions(comon_fractions);
@@ -112,15 +111,11 @@ void Graph::generate_main_points()
 
 void Graph::generate_points()
 {
-    qDebug() << "Start" << endl;
     vector<PointGraph> all_points;
     for(int i = 0; i < equations.size(); i++)
     {
         for(int j = 0; j < equations.size(); j++)
         {
-            qDebug() << QString::fromStdString((string)equations[i][0]) << " " << QString::fromStdString((string)equations[j][0]) << endl <<
-                         QString::fromStdString((string)equations[i][1]) << " " << QString::fromStdString((string)equations[j][1]) << endl <<
-                         QString::fromStdString((string)equations[i][2]) << " " << QString::fromStdString((string)equations[j][2]) << endl;
             PointGraph newPoint;
             if(i != j && !((equations[i][0] == equations[j][0]) && (equations[i][1] == equations[j][1])) &&
                     !(Fractions(0) == equations[i][0] && Fractions(0) == equations[i][1]) && !(Fractions(0) == equations[j][0] && Fractions(0) == equations[j][1]))
@@ -128,12 +123,10 @@ void Graph::generate_points()
                 if(Fractions(0) == equations[i][0] && Fractions(0) == equations[j][1] )
                 {
                     newPoint = PointGraph( equations[j][2] /equations[j][0],  equations[i][2]/equations[i][1], equations[i], equations[j]);
-                    qDebug() << 1;
                 }
                 else if(Fractions(0) == equations[i][1] && Fractions(0) == equations[j][0] )
                 {
                     newPoint = PointGraph(equations[i][2] /equations[i][0], equations[j][2] /equations[j][1], equations[i], equations[j]);
-                    qDebug() << 2;
                 }
                 else if(Fractions(0) == equations[i][0])
                 {
@@ -143,8 +136,6 @@ void Graph::generate_points()
                     x = x - t;
                     x = x/equations[j][0];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
-                    qDebug() << 3;
-                    qDebug() << QString::fromStdString((string) x) << " " << QString::fromStdString((string) y);
                 }
                 else if (Fractions(0) == equations[i][1])
                 {
@@ -154,8 +145,6 @@ void Graph::generate_points()
                     y = y - t;
                     y = y / equations[j][1];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
-                    qDebug() << 4;
-                    qDebug() << QString::fromStdString((string) x) << " " << QString::fromStdString((string) y);
                 }
                 else if(Fractions(0) == equations[j][0])
                 {
@@ -165,8 +154,6 @@ void Graph::generate_points()
                     x = x - t;
                     x = x/equations[i][0];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
-                    qDebug() << 5;
-                    qDebug() << QString::fromStdString((string) x) << " " << QString::fromStdString((string) y);
                 }
                 else if (Fractions(0) == equations[j][1])
                 {
@@ -176,8 +163,6 @@ void Graph::generate_points()
                     y = y - t;
                     y = y / equations[i][1];
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
-                    qDebug() << 6;
-                    qDebug() << QString::fromStdString((string) x) << " " << QString::fromStdString((string) y);
                 }
                 else
                 {
@@ -193,16 +178,11 @@ void Graph::generate_points()
                     y = y / det;
 
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
-                    qDebug() << 7;
-                     qDebug() << QString::fromStdString((string) x) << " " << QString::fromStdString((string) y);
                 }
-                qDebug() << QString::fromStdString((string) newPoint.getX()) << " " << QString::fromStdString((string) newPoint.getY());
                 all_points.push_back(newPoint);
             }
         }
     }
-    qDebug() << "CHECK" << endl;
-
     //Нужно проверить, что точка удовлетворяет всем неравенствам
     for(auto point : all_points)
     {
@@ -221,9 +201,6 @@ void Graph::generate_points()
                 x = Fractions(-1) * x;
             }
             Fractions t = x + y + equation[2];
-            qDebug() << QString::fromStdString((string) point.getX()) << " " << QString::fromStdString((string) point.getY()) << endl <<
-                        QString::fromStdString((string) equation[0]) << " " << QString::fromStdString((string) equation[1]) << " " << QString::fromStdString((string) equation[2]) << endl <<
-                        QString::fromStdString((string) t);
             if(t < Fractions(0))
             {
                 nice_point = false;
@@ -231,7 +208,6 @@ void Graph::generate_points()
 
         }
 
-        qDebug() << QString::fromStdString((string) point.getX()) << " " << QString::fromStdString((string) point.getY()) << " " << nice_point;
         if(nice_point)
         {
             nice_points.insert(point);
@@ -259,36 +235,7 @@ void Graph::generate_points()
             }
         }
     }
-    qDebug() << "LAST" << endl;
-//    //Следующим шагом будет - нахождение соседей для каждой точки
-//    for(auto& point1 : nice_points)
-//    {
-//        for(auto& point2 : nice_points)
-//        {
-//            if(point1.getFirst_equation() == point2.getFirst_equation() || point1.getSecond_equation() == point2.getSecond_equation())
-//            {
-//                if(point1.getFirst_neighbour() == NULL)
-//                    point1.setFirst_neighbour(&point2);
-//                else if(point1.getSecond_neigbour() == NULL)
-//                    point1.setSecond_neigbour(&point2);
 
-//                if(point2.getFirst_neighbour() == NULL)
-//                    point2.setFirst_neighbour(&point1);
-//                else if(point2.getSecond_neigbour() == NULL)
-//                    point2.setSecond_neigbour(&point1);
-//            }
-//        }
-//    }
-
-    //Последним шагом будет - сортировка точек по очередности их вырисовывания
-//    vector<PointGraph> vec_timer;
-//    while(vec_timer.size() != nice_points.size())
-//    {
-//        //Индекс основного массива, чтобы не повторятся по нему.
-//        int main_vec_index = 1;
-
-//        vec_timer.push_back(nice_points[0]);
-//    }
 }
 
 
