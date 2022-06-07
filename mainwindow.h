@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <vector>
 #include <string>
+#include <set>
 #include <QMessageBox>
 #include <QDebug>
 #include <algorithm>
@@ -107,8 +108,8 @@ private:
     //Метод отвечающий за начало вычислений графическим методом
     void start_graph_method();
 
-    vector<PointGraph> search_extr_points(vector<PointGraph> points);
-    Fractions search_extr_value(vector<PointGraph> points);
+    set<PointGraph> search_extr_points(set<PointGraph> points);
+    Fractions search_extr_value(set<PointGraph> points);
 
 
     Ui::MainWindow *ui;

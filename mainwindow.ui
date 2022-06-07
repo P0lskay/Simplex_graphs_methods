@@ -305,7 +305,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <property name="enabled">
@@ -1452,6 +1452,25 @@
       </property>
       <property name="text">
        <string>Получить решение</string>
+      </property>
+     </widget>
+     <widget class="QLabel" name="cout_graph_task">
+      <property name="geometry">
+       <rect>
+        <x>860</x>
+        <y>470</y>
+        <width>271</width>
+        <height>141</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>11</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </widget>

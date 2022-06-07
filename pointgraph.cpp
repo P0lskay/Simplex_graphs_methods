@@ -52,3 +52,8 @@ const vector<Fractions> &PointGraph::getSecond_equation() const
 {
     return second_equation;
 }
+
+bool PointGraph::operator <(const PointGraph &pg) const
+{
+    return this->getX() < pg.getX() || (this->getX() == pg.getX() && pg.getY() < this->getY());
+}

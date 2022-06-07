@@ -303,7 +303,7 @@ bool MainWindow::check_simplex_error()
         if(result)
             return result;
     }
-
+    return result;
 }
 
 
@@ -375,14 +375,23 @@ void MainWindow::start_graph_method()
     if(graph.getUp_restrictions() && graph.getRight_restrictions())
     {
         vector<vector<Fractions>> equation = graph.getRestrictions();
-        vector<PointGraph> points = graph.getNice_points();
+        set<PointGraph> points = graph.getNice_points();
         vector<pair<PointGraph, PointGraph>> main_points = graph.getMain_points();
-        //ui->main_graph->addGraph();
-        //ui->main_graph->graph(0)->setBrush(QBrush(QColor(0, 0, 255, 20)));
-         //ui->main_graph->graph(0)->setPen(QPen(Qt::blue));
+        set<PointGraph> extremum_points = search_extr_points(points);
+        Fractions extremum_value = search_extr_value(points);
 
-        ui->main_graph->xAxis->setRange(0, 20);
-        ui->main_graph->xAxis->setRange(0, 20);
+        //Выводим ответ
+        string result = "f = " + (string) extremum_value + '\n';
+        for(auto i : extremum_points)
+        {
+            result += "(" + (string) i.getX() + "; " + (string) i.getY() + ")" + '\n';
+        }
+        ui->cout_graph_task->setText(QString::fromStdString(result));
+
+
+        //Выводим линии графа и выделяем точки пересечения
+        ui->main_graph->xAxis->setRange(0, graph.getMaxX()+4);
+        ui->main_graph->yAxis->setRange(0, graph.getMaxY()+4);
 
 
 
@@ -390,7 +399,6 @@ void MainWindow::start_graph_method()
         {
             QVector<double> x(2), y(2);
             ui->main_graph->addGraph();
-            qDebug() << static_cast<double>(points[i].getX().getFraction().first) / static_cast<double>(points[i].getX().getFraction().second);
             x[0] = static_cast<double>(main_points[i].first.getX().getFraction().first) / static_cast<double>(main_points[i].first.getX().getFraction().second);
             x[1] = static_cast<double>(main_points[i].second.getX().getFraction().first) / static_cast<double>(main_points[i].second.getX().getFraction().second);
             y[0] = static_cast<double>(main_points[i].first.getY().getFraction().first) / static_cast<double>(main_points[i].first.getY().getFraction().second);
@@ -398,43 +406,49 @@ void MainWindow::start_graph_method()
             ui->main_graph->graph(i)->setData(x, y);
             ui->main_graph->graph(i)->setPen(QPen(Qt::blue));
         }
-//        x.push_back(x[0]);
-//        y.push_back(y[0]);
-//        qDebug() << x.size() << " " << y.size();
-//        QCPGraph *newCurve = new QCPGraph(ui->main_graph->xAxis, ui->main_graph->yAxis);
-//        newCurve->setData(x, y);
-//        newCurve->setBrush(QBrush(QColor(0, 0, 255, 20)));
-//        newCurve->setAdaptiveSampling(false);
-//        newCurve->setScatterStyle(QCPScatterStyle::ssCircle);
-//        newCurve->setPen(QPen(QBrush(Qt::red), 2));
+        QVector<double> x1(points.size()+1), y1(points.size()+1);
+        int j = 0;
+        for(auto& i : points)
+        {
+            x1[j] = static_cast<double>(i.getX().getFraction().first) / static_cast<double>(i.getX().getFraction().second);
+            y1[j] = static_cast<double>(i.getY().getFraction().first) / static_cast<double>(i.getY().getFraction().second);
+            j++;
+        }
+        QCPGraph *newCurve = new QCPGraph(ui->main_graph->xAxis, ui->main_graph->yAxis);
+        newCurve->setData(x1, y1);
+        newCurve->setLineStyle(QCPGraph::lsNone);
+        newCurve->setScatterStyle(QCPScatterStyle::ssCircle);
+        newCurve->setPen(QPen(QBrush(Qt::red), 5));
+
+        ui->main_graph->setInteractions(QCP::iRangeDrag | QCP::iRangeZoom | QCP::iSelectPlottables);
         ui->main_graph->replot();
 
     }
 
 }
 
-vector<PointGraph> MainWindow::search_extr_points(vector<PointGraph> points)
+set<PointGraph> MainWindow::search_extr_points(set<PointGraph> points)
 {
     Fractions min_value = search_extr_value(points);
-    vector<PointGraph> min_points;
+    set<PointGraph> min_points;
 
     for(auto i : points)
     {
         Fractions t = i.getX() * graph_main_task[graph_main_task.size()-3];
         t = i.getY() * graph_main_task[graph_main_task.size()-2] + t;
         if(t == min_value)
-            min_points.push_back(i);
+            min_points.insert(i);
     }
 
     return min_points;
 }
 
-Fractions MainWindow::search_extr_value(vector<PointGraph> points)
+Fractions MainWindow::search_extr_value(set<PointGraph> points)
 {
     if(points.size() == 0)
         return Fractions(0);
-    Fractions min_value = (points[0].getX() * graph_main_task[graph_main_task.size()-3]);
-    min_value = (points[0].getY() * graph_main_task[graph_main_task.size()-2]) + min_value;
+    Fractions min_value = (points.begin()->getX() * graph_main_task[graph_main_task.size()-3]);
+    min_value = (points.begin()->getY() * graph_main_task[graph_main_task.size()-2]) + min_value;
 
     for(auto i : points)
     {

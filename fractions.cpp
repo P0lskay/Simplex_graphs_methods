@@ -99,7 +99,7 @@ bool Fractions::operator ==(const Fractions& rhs) const
 
 bool Fractions::operator <(Fractions& rhs)
 {
-    return static_cast<double>(this->fraction.first / this->fraction.second) < static_cast<double>(static_cast<double>(rhs.fraction.first) / static_cast<double>(rhs.fraction.second));
+    return static_cast<double>(static_cast<double>(this->fraction.first) / static_cast<double>(this->fraction.second)) < static_cast<double>(static_cast<double>(rhs.fraction.first) / static_cast<double>(rhs.fraction.second));
 }
 
 bool Fractions::operator <(const Fractions& rhs) const

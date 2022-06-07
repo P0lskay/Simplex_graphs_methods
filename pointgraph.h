@@ -26,6 +26,8 @@ public:
 
     const vector<Fractions> &getSecond_equation() const;
 
+    bool operator < (const PointGraph& pg) const;
+
 private:
     pair<Fractions, Fractions> point;
     PointGraph* first_neighbour = NULL;

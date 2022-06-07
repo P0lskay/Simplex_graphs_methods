@@ -2,6 +2,7 @@
 #define GRAPH_H
 #include <vector>
 #include <map>
+#include <set>
 #include "pointgraph.h"
 #include "fractions.h"
 
@@ -16,7 +17,7 @@ public:
 
     const vector<vector<Fractions> > &getRestrictions() const;
 
-    const vector<PointGraph> &getNice_points() const;
+    const set<PointGraph> &getNice_points() const;
 
     int getMaxX() const;
 
@@ -35,7 +36,7 @@ public:
 private:
     vector<vector<Fractions>> restrictions;
     vector<vector<Fractions>> equations;
-    vector<PointGraph> nice_points;
+    set<PointGraph> nice_points;
     vector<pair<PointGraph, PointGraph>> main_points;
     int maxX;
     int maxY;

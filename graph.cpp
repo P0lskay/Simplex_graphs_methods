@@ -40,7 +40,7 @@ const vector<vector<Fractions> > &Graph::getRestrictions() const
     return restrictions;
 }
 
-const vector<PointGraph> &Graph::getNice_points() const
+const set<PointGraph> &Graph::getNice_points() const
 {
     return nice_points;
 }
@@ -90,15 +90,21 @@ void Graph::generate_main_points()
             throw exception("Одно из ограничений нулевое");
         else if(i[0] == Fractions(0))
         {
-            main_points.push_back({PointGraph(Fractions(0), i[2]/i[1], ordinate, i), PointGraph(Fractions(100), i[2]/i[1], ordinate, i)});
+            main_points.push_back({PointGraph(Fractions(-200), i[2]/i[1], ordinate, i), PointGraph(Fractions(200), i[2]/i[1], ordinate, i)});
         }
         else if(i[1] == Fractions(0))
         {
-            main_points.push_back({PointGraph(i[2]/i[0], Fractions(0), abcisse, i), PointGraph(i[2]/i[0], Fractions(100), abcisse, i)});
+            main_points.push_back({PointGraph(i[2]/i[0], Fractions(-200), abcisse, i), PointGraph(i[2]/i[0], Fractions(200), abcisse, i)});
         }
         else
         {
-            main_points.push_back({PointGraph(Fractions(0), i[2]/i[1], ordinate, i), PointGraph(i[2]/i[0], Fractions(0),  abcisse, i)});
+            Fractions x1 = Fractions(-100) * i[0];
+            Fractions y1 = Fractions(-100) * i[1];
+            Fractions y2 = Fractions(100) * i[1];
+            if((i[2]-x1)/i[1] < Fractions(0))
+                main_points.push_back({PointGraph(Fractions(-100), (i[2]-x1)/i[1], ordinate, i), PointGraph((i[2]-y2)/i[0], Fractions(100),  abcisse, i)});
+            else
+                main_points.push_back({PointGraph(Fractions(-100), (i[2]-x1)/i[1], ordinate, i), PointGraph((i[2]-y1)/i[0], Fractions(-100),  abcisse, i)});
         }
     }
 }
@@ -228,13 +234,13 @@ void Graph::generate_points()
         qDebug() << QString::fromStdString((string) point.getX()) << " " << QString::fromStdString((string) point.getY()) << " " << nice_point;
         if(nice_point)
         {
-            nice_points.push_back(point);
+            nice_points.insert(point);
             if(nice_points.size() == 1) //Если в векторе только одна точка, значит у нас может быть только 1 минимум и максимум
             {
-                maxX = nice_points[0].getX().getFraction().first / nice_points[0].getX().getFraction().second;
+                maxX = point.getX().getFraction().first /point.getX().getFraction().second;
                 minX = maxX;
 
-                maxY = nice_points[0].getY().getFraction().first / nice_points[0].getY().getFraction().second;
+                maxY = point.getY().getFraction().first / point.getY().getFraction().second;
                 minY = maxY;
             }
             else
@@ -254,28 +260,25 @@ void Graph::generate_points()
         }
     }
     qDebug() << "LAST" << endl;
-    int i = 0;
-    //Следующим шагом будет - нахождение соседей для каждой точки
-    for(auto& point1 : nice_points)
-    {
-        qDebug() <<  QString::fromStdString((string) point1.getX()) << " " << QString::fromStdString((string) point1.getY())<< endl;
-        i++;
-        for(auto& point2 : nice_points)
-        {
-            if(point1.getFirst_equation() == point2.getFirst_equation() || point1.getSecond_equation() == point2.getSecond_equation())
-            {
-                if(point1.getFirst_neighbour() == NULL)
-                    point1.setFirst_neighbour(&point2);
-                else if(point1.getSecond_neigbour() == NULL)
-                    point1.setSecond_neigbour(&point2);
+//    //Следующим шагом будет - нахождение соседей для каждой точки
+//    for(auto& point1 : nice_points)
+//    {
+//        for(auto& point2 : nice_points)
+//        {
+//            if(point1.getFirst_equation() == point2.getFirst_equation() || point1.getSecond_equation() == point2.getSecond_equation())
+//            {
+//                if(point1.getFirst_neighbour() == NULL)
+//                    point1.setFirst_neighbour(&point2);
+//                else if(point1.getSecond_neigbour() == NULL)
+//                    point1.setSecond_neigbour(&point2);
 
-                if(point2.getFirst_neighbour() == NULL)
-                    point2.setFirst_neighbour(&point1);
-                else if(point2.getSecond_neigbour() == NULL)
-                    point2.setSecond_neigbour(&point1);
-            }
-        }
-    }
+//                if(point2.getFirst_neighbour() == NULL)
+//                    point2.setFirst_neighbour(&point1);
+//                else if(point2.getSecond_neigbour() == NULL)
+//                    point2.setSecond_neigbour(&point1);
+//            }
+//        }
+//    }
 
     //Последним шагом будет - сортировка точек по очередности их вырисовывания
 //    vector<PointGraph> vec_timer;
