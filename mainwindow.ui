@@ -1257,9 +1257,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>130</y>
-         <width>811</width>
-         <height>141</height>
+         <y>100</y>
+         <width>201</width>
+         <height>161</height>
         </rect>
        </property>
        <property name="inputMethodHints">
@@ -1318,9 +1318,9 @@
        <property name="geometry">
         <rect>
          <x>0</x>
-         <y>50</y>
-         <width>811</width>
-         <height>61</height>
+         <y>10</y>
+         <width>171</width>
+         <height>71</height>
         </rect>
        </property>
        <property name="inputMethodHints">

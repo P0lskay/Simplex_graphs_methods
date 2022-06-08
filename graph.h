@@ -30,6 +30,7 @@ public:
     bool getUp_restrictions() const;
 
     bool getRight_restrictions() const;
+    bool getRound_restrictions() const;
 
     const vector<pair<PointGraph, PointGraph> > &getMain_points() const;
 
@@ -45,6 +46,8 @@ private:
 
     bool up_restrictions = false;
     bool right_restrictions = false;
+    bool round_x_restrictions = false;
+    bool round_y_restrictions = false;
 
     void generate_main_points();
     void generate_points();

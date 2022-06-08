@@ -385,7 +385,7 @@ void MainWindow::start_graph_method()
     //Создаем матрицу для графического метода
     graph = *new Graph(graph_restrictions_matrix, true , common_fractions);
     normal_building();
-    if(graph_right_task_ok && graph_up_task_ok)
+    if(true)
     {
         vector<vector<Fractions>> equation = graph.getRestrictions();
         set<PointGraph> points = graph.getNice_points();
@@ -394,12 +394,21 @@ void MainWindow::start_graph_method()
         Fractions extremum_value = search_extr_value(points);
 
         //Выводим ответ
-        string result = "f = " + (string) extremum_value + '\n';
-        for(auto i : extremum_points)
+        if(graph_up_task_ok && graph_right_task_ok)
         {
-            result += "(" + (string) i.getX() + "; " + (string) i.getY() + ")" + '\n';
+            string result = "f = " + (string) extremum_value + '\n';
+            for(auto i : extremum_points)
+            {
+                result += "(" + (string) i.getX() + "; " + (string) i.getY() + ")" + '\n';
+            }
+            ui->cout_graph_task->setText(QString::fromStdString(result));
         }
-        ui->cout_graph_task->setText(QString::fromStdString(result));
+        else if(!graph_up_task_ok && !graph_right_task_ok)
+            ui->cout_graph_task->setText("Функция неограничена!");
+        else if(!graph_up_task_ok)
+            ui->cout_graph_task->setText("Функция неограничена сверху!");
+        else if(!graph_right_task_ok)
+            ui->cout_graph_task->setText("Функция неограничена справа!");
 
 
         //Выводим линии графа и выделяем точки пересечения
@@ -421,7 +430,7 @@ void MainWindow::start_graph_method()
             ui->main_graph->graph(i)->setData(x, y);
             ui->main_graph->graph(i)->setPen(QPen(Qt::blue));
         }
-        QVector<double> x1(points.size()+1), y1(points.size()+1);
+        QVector<double> x1(points.size()), y1(points.size());
         int j = 0;
         for(auto& i : points)
         {
@@ -472,13 +481,18 @@ void MainWindow::normal_building()
 
     draw_normal(x, y);
 
-    if(y_finish_point > 0 && !graph.getUp_restrictions())
+    if(y_finish_point > 0 && x_finish_point > 0 && !graph.getRound_restrictions())
     {
         graph_up_task_ok = false;
+        graph_right_task_ok = false;
     }
-    if(x_finish_point > 0 && !graph.getRight_restrictions())
+    if(x_finish_point > 0 && y_finish_point <= 0 && !graph.getRight_restrictions() && !graph.getRound_restrictions())
     {
         graph_right_task_ok = false;
+    }
+    if(x_finish_point <= 0 && y_finish_point > 0 && !graph.getUp_restrictions() && !graph.getRound_restrictions())
+    {
+        graph_up_task_ok = false;
     }
 
 
@@ -507,7 +521,6 @@ void MainWindow::draw_normal(QVector<double> x, QVector<double> y)
         normal_y[0] = x[1] * -1;
         normal_y[1] = x[1];
     }
-    qDebug() << normal_x[0] << " " << normal_y[0] << endl << normal_x[1] << " " << normal_y[1];
     QCPCurve *normal = new QCPCurve(ui->main_graph->xAxis, ui->main_graph->yAxis);
 
     normal->setData(normal_x, normal_y);
@@ -543,7 +556,7 @@ Fractions MainWindow::search_extr_value(set<PointGraph> points)
     {
         Fractions t = i.getX() * graph_main_task[graph_main_task.size()-3];
         t = i.getY() * graph_main_task[graph_main_task.size()-2] + t;
-        if(graph_min_task)
+        if(ui->task_type_2->currentText() == "Минимизировать")
         {
         if(t < extremum_value)
             extremum_value = t;
@@ -930,6 +943,7 @@ void MainWindow::on_btn_restart_simplex_released()
     ui->table_task_data->clear();
     ui->table_restrictions_data->clear();
     ui->simplex_first_table->clear();
+    ui->simplex_second_table->clear();
     ui->table_restrictions_data->clear();
     ui->cout_simplex_task_first->clear();
     ui->cout_simplex_task_second->clear();
