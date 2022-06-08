@@ -52,6 +52,10 @@ private slots:
 
     void on_restrictions_num_2_valueChanged(int arg1);
 
+    void on_btn_restart_simplex_released();
+
+    void on_btn_restart_graph_released();
+
 private:
     Simplex simplex= *new Simplex();
     Graph graph = *new Graph();

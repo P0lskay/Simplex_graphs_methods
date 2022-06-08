@@ -274,8 +274,8 @@
      <widget class="QPushButton" name="btn_send_into_data">
       <property name="geometry">
        <rect>
-        <x>10</x>
-        <y>580</y>
+        <x>0</x>
+        <y>520</y>
         <width>171</width>
         <height>41</height>
        </rect>
@@ -288,6 +288,25 @@
       </property>
       <property name="text">
        <string>Получить решение</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_restart_simplex">
+      <property name="geometry">
+       <rect>
+        <x>0</x>
+        <y>580</y>
+        <width>171</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Сброс ввода</string>
       </property>
      </widget>
     </widget>
@@ -723,6 +742,9 @@
          </item>
          <item>
           <widget class="QPushButton" name="btn_next_simplex_first">
+           <property name="enabled">
+            <bool>false</bool>
+           </property>
            <property name="text">
             <string>Вперед</string>
            </property>
@@ -744,6 +766,9 @@
         </property>
        </widget>
        <widget class="QPushButton" name="pushButton">
+        <property name="enabled">
+         <bool>false</bool>
+        </property>
         <property name="geometry">
          <rect>
           <x>970</x>
@@ -1458,7 +1483,7 @@
       <property name="geometry">
        <rect>
         <x>860</x>
-        <y>470</y>
+        <y>530</y>
         <width>271</width>
         <height>141</height>
        </rect>
@@ -1471,6 +1496,25 @@
       </property>
       <property name="text">
        <string/>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="btn_restart_graph">
+      <property name="geometry">
+       <rect>
+        <x>860</x>
+        <y>450</y>
+        <width>171</width>
+        <height>41</height>
+       </rect>
+      </property>
+      <property name="font">
+       <font>
+        <family>Times New Roman</family>
+        <pointsize>12</pointsize>
+       </font>
+      </property>
+      <property name="text">
+       <string>Сброс ввода</string>
       </property>
      </widget>
     </widget>

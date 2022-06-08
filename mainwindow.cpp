@@ -138,11 +138,13 @@ void MainWindow::on_btn_send_into_data_released()
 
         for(int i = 0; i < variables_num+1; i++)
         {
-            //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
             if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
                 throw exception();
 
             main_task.push_back(Fractions(ui->table_task_data->item(0, i)->text().toInt()));
+
+            if(ui->task_type->currentText() == "Максимизировать")
+                main_task[i] = Fractions(-1) * main_task[i];
         }
 
         for(int i = 0; i < restriction_num; i++)
@@ -150,13 +152,18 @@ void MainWindow::on_btn_send_into_data_released()
             restrictions_matrix.push_back({});
             for(int j = 0; j < variables_num+1; j++)
             {
-                //ПОКА ЧТО ПРИ ВВОДЕ НЕЧИСЕЛ ПРОГРАММА ЗАВЕРШАЕТСЯ, В БУДУЩЕМ НУЖНО ИСПРАВИТЬ
                 if(!re.exactMatch(ui->table_restrictions_data->item(i, j)->text()))
                     throw exception();
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
         }
         start_simplex();
+        ui->btn_send_into_data->setEnabled(false);
+        ui->btn_last_simplex_first->setEnabled(false);
+        ui->btn_last_simplex_second->setEnabled(false);
+        ui->btn_next_simplex_second->setEnabled(false);
+        ui->btn_next_simplex_first->setEnabled(true);
+        ui->pushButton->setEnabled(true);
 
     }  catch (exception ex) {
         QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
@@ -197,6 +204,7 @@ void MainWindow::on_btn_send_into_data_2_released()
             }
         }
         start_graph_method();
+        ui->btn_send_into_data_2->setEnabled(false);
 
     }  catch (exception ex) {
         QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
@@ -902,7 +910,66 @@ void MainWindow::on_pushButton_released()
 }
 
 
+void MainWindow::on_btn_restart_simplex_released()
+{
+    //Обнуляем переменные
+    variables_num = 0;
+    restriction_num = 0;
+    x = 0;
+    y = 0;
+    num_iter = 0;
+    num_iter_main = 0;
+    x1 = 0;
+    y1 = 0;
+
+    //Очищаем все  таблицы
+    current_matrix_row.clear();
+    current_matrix_column.clear();
+    main_task.clear();
+    restrictions_matrix.clear();
+    ui->table_task_data->clear();
+    ui->table_restrictions_data->clear();
+    ui->simplex_first_table->clear();
+    ui->table_restrictions_data->clear();
+    ui->cout_simplex_task_first->clear();
+    ui->cout_simplex_task_second->clear();
+    //Обнуляем кол-во столбцов и ставим 0 значения
+    ui->table_task_data->setColumnCount(0);
+    ui->table_task_data->setRowCount(0);
+    ui->table_restrictions_data->setColumnCount(0);
+    ui->table_restrictions_data->setRowCount(0);
+    ui->variables_num->setValue(0);
+    ui->restrictions_num->setValue(0);
+    //Обновляем доступность кнопок
+    ui->btn_send_into_data->setEnabled(true);
+    ui->btn_last_simplex_first->setEnabled(false);
+    ui->btn_last_simplex_second->setEnabled(false);
+    ui->btn_next_simplex_first->setEnabled(false);
+    ui->btn_next_simplex_second->setEnabled(false);
+    ui->pushButton->setEnabled(false);
+}
 
 
+void MainWindow::on_btn_restart_graph_released()
+{
+    graph_restriction_num = 0;
+    graph_up_task_ok = true;
+    graph_right_task_ok = true;
 
+
+    graph_main_task.clear();
+    graph_restrictions_matrix.clear();
+
+    ui->main_graph->clearGraphs();
+    ui->main_graph->clearItems();
+    ui->main_graph->clearPlottables();
+    ui->table_restrictions_data_2->clear();
+    ui->table_restrictions_data_2->setRowCount(0);
+    ui->restrictions_num_2->setValue(0);
+    ui->cout_graph_task->clear();
+
+    ui->btn_send_into_data_2->setEnabled(true);
+
+    ui->main_graph->replot();
+}
 
