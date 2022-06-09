@@ -63,26 +63,35 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
 
     if(arg1 != restriction_num)
     {
-        restriction_num = arg1;
-
-        ui->table_restrictions_data->setRowCount(restriction_num);
-
-        for(int i = 0; i < restriction_num; i++)
+        if(arg1 < variables_num)
         {
-            QString str = "f(x)" + QString::number(i+1);
-             ui->table_restrictions_data->setVerticalHeaderItem(i ,new QTableWidgetItem(str));
+            restriction_num = arg1;
+
+            ui->table_restrictions_data->setRowCount(restriction_num);
+
+            for(int i = 0; i < restriction_num; i++)
+            {
+                QString str = "f(x)" + QString::number(i+1);
+                 ui->table_restrictions_data->setVerticalHeaderItem(i ,new QTableWidgetItem(str));
+            }
+
+            for(int i = 0; i < variables_num+1; i++)
+            {
+                  ui->table_task_data->setItem(0, i, new QTableWidgetItem("0"));
+            }
+
+            for(int i = 0; i < variables_num+1; i++)
+            {
+                for(int j = 0; j < restriction_num; j++)
+                  ui->table_restrictions_data->setItem(j, i, new QTableWidgetItem("0"));
+            }
+        }
+        else
+        {
+            ui->restrictions_num->setValue(variables_num-1);
+            QMessageBox::warning(this, "Внимание","Данный калькулятор решает только задачи, где количество переменных больше количества ограничений!");
         }
 
-        for(int i = 0; i < variables_num+1; i++)
-        {
-              ui->table_task_data->setItem(0, i, new QTableWidgetItem("0"));
-        }
-
-        for(int i = 0; i < variables_num+1; i++)
-        {
-            for(int j = 0; j < restriction_num; j++)
-              ui->table_restrictions_data->setItem(j, i, new QTableWidgetItem("0"));
-        }
     }
 }
 
@@ -858,7 +867,13 @@ void MainWindow::on_btn_next_simplex_second_released()
         }
         num_iter_main++;
     }
-    if(check_simplex_end())
+
+    if(check_simplex_error())
+    {
+        ui->btn_next_simplex_first->setEnabled(false);
+        ui->cout_simplex_task_second->setText(QString::fromStdString("Функция не ограничена. Решения нет!"));
+    }
+    else if(check_simplex_end())
     {
         string res_x = "x = ( ";
         string res_f = "f = ";
@@ -885,11 +900,6 @@ void MainWindow::on_btn_next_simplex_second_released()
         ui->cout_simplex_task_second->setText(QString::fromStdString(res_x + '\n' + res_f));
 
 
-    }
-    else if(check_simplex_error())
-    {
-        ui->btn_next_simplex_first->setEnabled(false);
-        ui->cout_simplex_task_second->setText(QString::fromStdString("Функция не ограничена. Решения нет!"));
     }
 }
 
@@ -985,5 +995,25 @@ void MainWindow::on_btn_restart_graph_released()
     ui->btn_send_into_data_2->setEnabled(true);
 
     ui->main_graph->replot();
+}
+
+
+void MainWindow::on_save_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this);
+        if (fileName.isEmpty()) {
+            return;
+        }
+    ModelStorage::load(fileName, ui->table_task_data, ui->table_restrictions_data, ui->variables_num, ui->restrictions_num);
+}
+
+
+void MainWindow::on_load_triggered()
+{
+    QString fileName = QFileDialog::getSaveFileName(this);
+        if (fileName.isEmpty()) {
+            return;
+        }
+    ModelStorage::save(fileName, QStandardItemModel(ui->table_task_data), QStandardItemModel(ui->table_restrictions_data));
 }
 

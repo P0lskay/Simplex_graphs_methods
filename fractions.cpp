@@ -92,6 +92,11 @@ bool Fractions::operator ==(Fractions& rhs)
     return this->fraction.first == rhs.fraction.first && this->fraction.second == rhs.fraction.second;
 }
 
+bool Fractions::operator !=(Fractions &rhs)
+{
+    return this->fraction.first != rhs.fraction.first || this->fraction.second != rhs.fraction.second;
+}
+
 bool Fractions::operator ==(const Fractions& rhs) const
 {
     return this->fraction.first == rhs.fraction.first && this->fraction.second == rhs.fraction.second;

@@ -127,7 +127,9 @@ void Graph::generate_points()
         for(int j = 0; j < equations.size(); j++)
         {
             PointGraph newPoint;
-            if(i != j && !((equations[i][0]/equations[j][0]) ==  (equations[i][1]/equations[j][1])) &&
+            if(i != j && ((Fractions(0) != equations[j][1] && Fractions(0) != equations[j][0] && !((equations[i][0]/equations[j][0]) ==  (equations[i][1]/equations[j][1]))) ||
+                    (((Fractions(0) != equations[j][0]) || (Fractions(0) == equations[j][0] && Fractions(0) != equations[i][0])) &&
+                          ((Fractions(0) != equations[j][1]) || (Fractions(0) == equations[j][1] && Fractions(0) != equations[i][1])))) &&
                     !(Fractions(0) == equations[i][0] && Fractions(0) == equations[i][1]) && !(Fractions(0) == equations[j][0] && Fractions(0) == equations[j][1]))
             {
                 if(Fractions(0) == equations[i][0] && Fractions(0) == equations[j][1] )
@@ -192,6 +194,7 @@ void Graph::generate_points()
                  qDebug() << QString::fromStdString((string) newPoint.getX()) << " " << QString::fromStdString((string) newPoint.getY());
                 all_points.push_back(newPoint);
             }
+
         }
     }
 

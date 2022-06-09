@@ -13,6 +13,7 @@
 #include "simplex.h"
 #include "graph.h"
 #include "pointgraph.h"
+#include "modelstorage.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -55,6 +56,10 @@ private slots:
     void on_btn_restart_simplex_released();
 
     void on_btn_restart_graph_released();
+
+    void on_save_triggered();
+
+    void on_load_triggered();
 
 private:
     Simplex simplex= *new Simplex();
