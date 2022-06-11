@@ -63,8 +63,7 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
 
     if(arg1 != restriction_num)
     {
-        if(arg1 < variables_num)
-        {
+
             restriction_num = arg1;
 
             ui->table_restrictions_data->setRowCount(restriction_num);
@@ -85,13 +84,6 @@ void MainWindow::on_restrictions_num_valueChanged(int arg1)
                 for(int j = 0; j < restriction_num; j++)
                   ui->table_restrictions_data->setItem(j, i, new QTableWidgetItem("0"));
             }
-        }
-        else
-        {
-            ui->restrictions_num->setValue(variables_num-1);
-            QMessageBox::warning(this, "Внимание","Данный калькулятор решает только задачи, где количество переменных больше количества ограничений!");
-        }
-
     }
 }
 
@@ -131,6 +123,8 @@ void MainWindow::on_btn_send_into_data_released()
 
     try
     {
+        if(restriction_num >= variables_num)
+            throw invalid_argument("");
         if(ui->type_fractions->currentText() == "Десятичный")
             common_fractions = false;
         else
@@ -174,7 +168,9 @@ void MainWindow::on_btn_send_into_data_released()
         ui->btn_next_simplex_first->setEnabled(true);
         ui->pushButton->setEnabled(true);
 
-    }  catch (exception ex) {
+    } catch (invalid_argument ex) {
+        QMessageBox::warning(this, "Внимание","Калькулятор умеет решать только задачи, где число ограничений меньше числа переменных!");
+    } catch (exception ex) {
         QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
     }
 
@@ -870,7 +866,7 @@ void MainWindow::on_btn_next_simplex_second_released()
 
     if(check_simplex_error())
     {
-        ui->btn_next_simplex_first->setEnabled(false);
+        ui->btn_next_simplex_second->setEnabled(false);
         ui->cout_simplex_task_second->setText(QString::fromStdString("Функция не ограничена. Решения нет!"));
     }
     else if(check_simplex_end())
@@ -899,6 +895,7 @@ void MainWindow::on_btn_next_simplex_second_released()
 
         ui->cout_simplex_task_second->setText(QString::fromStdString(res_x + '\n' + res_f));
 
+        ui->btn_next_simplex_second->setEnabled(false);
 
     }
 }
@@ -1004,16 +1001,16 @@ void MainWindow::on_save_triggered()
         if (fileName.isEmpty()) {
             return;
         }
-    ModelStorage::load(fileName, ui->table_task_data, ui->table_restrictions_data, ui->variables_num, ui->restrictions_num);
+        ModelStorage::save(fileName, ui->table_task_data, ui->table_restrictions_data);
 }
 
 
 void MainWindow::on_load_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this);
+    QString fileName = QFileDialog::getOpenFileName(this);
         if (fileName.isEmpty()) {
             return;
         }
-    ModelStorage::save(fileName, QStandardItemModel(ui->table_task_data), QStandardItemModel(ui->table_restrictions_data));
+        ModelStorage::load(fileName, ui->table_task_data, ui->table_restrictions_data, ui->variables_num, ui->restrictions_num);
 }
 
