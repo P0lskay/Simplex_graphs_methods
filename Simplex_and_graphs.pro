@@ -15,6 +15,8 @@ SOURCES += \
     modelstorage.cpp \
     pointgraph.cpp \
     qcustomplot.cpp \
+    referencegraph.cpp \
+    referencesimplex.cpp \
     simplex.cpp \
     unused_methods.cpp
 
@@ -25,10 +27,14 @@ HEADERS += \
     modelstorage.h \
     pointgraph.h \
     qcustomplot.h \
+    referencegraph.h \
+    referencesimplex.h \
     simplex.h
 
 FORMS += \
-    mainwindow.ui
+    mainwindow.ui \
+    referencegraph.ui \
+    referencesimplex.ui
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

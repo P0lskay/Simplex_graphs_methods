@@ -14,6 +14,8 @@
 #include "graph.h"
 #include "pointgraph.h"
 #include "modelstorage.h"
+#include "referencesimplex.h"
+#include "referencegraph.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -61,7 +63,12 @@ private slots:
 
     void on_load_triggered();
 
+    void on_referenceSimplex_triggered();
+
+    void on_referenceGraph_triggered();
+
 private:
+
     Simplex simplex= *new Simplex();
     Graph graph = *new Graph();
     bool common_fractions;

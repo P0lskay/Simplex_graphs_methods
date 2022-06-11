@@ -49,7 +49,7 @@ vector<pair<int, int>> Simplex::possible_basis_free()
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
                 {
-                    if(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem && find(free_var.begin(), free_var.end(), j) != free_var.end())
+                    if(last_matrix[j][i] > 0 && last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem && find(free_var.begin(), free_var.end(), j) != free_var.end())
                         result.push_back({j, i});
                 }
             }
@@ -93,7 +93,7 @@ vector<pair<int, int> > Simplex::possible_basis()
                 //Теперь добавляем все координаты, элементы которых равны минимуму
                 for(int j = 0; j < index_last_row; j++)
                 {
-                    if(last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem)
+                    if(last_matrix[j][i] > 0 && last_matrix[j][last_matrix[j].size()-1]/last_matrix[j][i] == min_elem)
                         result.push_back({j, i});
                 }
             }

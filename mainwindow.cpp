@@ -25,7 +25,6 @@ void MainWindow::on_variables_num_valueChanged(int arg1)
         variables_num = arg1;
         ui->table_task_data->setColumnCount(variables_num+1);
         ui->table_task_data->setRowCount(1);
-        //char s = u8"\u2081";
         ui->table_task_data->setVerticalHeaderItem(0 ,new QTableWidgetItem("f(х)0"));
 
 
@@ -138,11 +137,11 @@ void MainWindow::on_btn_send_into_data_released()
         for (int i = variables_num + 1; i < restriction_num + variables_num+1; i++) {
             current_matrix_column.push_back(i);
         }
-
         for(int i = 0; i < variables_num+1; i++)
         {
             if(!re.exactMatch(ui->table_task_data->item(0, i)->text()))
-                throw exception();
+                throw exception("Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
+
 
             main_task.push_back(Fractions(ui->table_task_data->item(0, i)->text().toInt()));
 
@@ -150,16 +149,23 @@ void MainWindow::on_btn_send_into_data_released()
                 main_task[i] = Fractions(-1) * main_task[i];
         }
 
+
         for(int i = 0; i < restriction_num; i++)
         {
+            bool task_ok = false;
             restrictions_matrix.push_back({});
             for(int j = 0; j < variables_num+1; j++)
             {
+                if(j < variables_num && ui->table_restrictions_data->item(i, j)->text().toInt() != 0)
+                    task_ok = true;
                 if(!re.exactMatch(ui->table_restrictions_data->item(i, j)->text()))
-                    throw exception();
+                    throw exception("Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
                 restrictions_matrix[i].push_back(ui->table_restrictions_data->item(i, j)->text().toInt());
             }
+            if(!task_ok)
+                throw exception("У вас не должно быть ограничений без ненулевых Xi!");
         }
+
         start_simplex();
         ui->btn_send_into_data->setEnabled(false);
         ui->btn_last_simplex_first->setEnabled(false);
@@ -171,7 +177,8 @@ void MainWindow::on_btn_send_into_data_released()
     } catch (invalid_argument ex) {
         QMessageBox::warning(this, "Внимание","Калькулятор умеет решать только задачи, где число ограничений меньше числа переменных!");
     } catch (exception ex) {
-        QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
+        QMessageBox::warning(this, "Внимание", ex.what());
+        on_btn_restart_simplex_released();
     }
 
 
@@ -421,7 +428,8 @@ void MainWindow::start_graph_method()
         ui->main_graph->xAxis->setLabel("X1");
         ui->main_graph->yAxis->setRange(0, graph.getMaxY()+4);
         ui->main_graph->yAxis->setLabel("X2");
-
+        ui->main_graph->legend->setVisible(true);
+        ui->main_graph->legend->setBrush(QBrush(QColor(255,255,255,230)));
 
 
         for(int i = 0; i < main_points.size(); i++)
@@ -434,6 +442,9 @@ void MainWindow::start_graph_method()
             y[1] = static_cast<double>(main_points[i].second.getY().getFraction().first) / static_cast<double>(main_points[i].second.getY().getFraction().second);
             ui->main_graph->graph(i)->setData(x, y);
             ui->main_graph->graph(i)->setPen(QPen(Qt::blue));
+            ui->main_graph->graph(i)->setName("Ограничение");
+            if(i!=0)
+                ui->main_graph->legend->removeAt(1);
         }
         QVector<double> x1(points.size()), y1(points.size());
         int j = 0;
@@ -445,6 +456,7 @@ void MainWindow::start_graph_method()
         }
         QCPGraph *newCurve = new QCPGraph(ui->main_graph->xAxis, ui->main_graph->yAxis);
         newCurve->setData(x1, y1);
+        newCurve->setName("Крайние точки подходящей области");
         newCurve->setLineStyle(QCPGraph::lsNone);
         newCurve->setScatterStyle(QCPScatterStyle::ssCircle);
         newCurve->setPen(QPen(QBrush(Qt::red), 5));
@@ -531,6 +543,7 @@ void MainWindow::draw_normal(QVector<double> x, QVector<double> y)
     normal->setData(normal_x, normal_y);
     normal->setLineStyle(QCPCurve::lsLine);
     normal->setPen(QPen(QBrush(Qt::green), 2));
+    normal->setName("Нормаль и ее направление");
 
 }
 
@@ -1012,5 +1025,19 @@ void MainWindow::on_load_triggered()
             return;
         }
         ModelStorage::load(fileName, ui->table_task_data, ui->table_restrictions_data, ui->variables_num, ui->restrictions_num);
+}
+
+
+void MainWindow::on_referenceSimplex_triggered()
+{
+    referenceSimplex *rs = new referenceSimplex();
+    rs->show();
+}
+
+
+void MainWindow::on_referenceGraph_triggered()
+{
+    referenceGraph *rg = new referenceGraph();
+    rg->show();
 }
 

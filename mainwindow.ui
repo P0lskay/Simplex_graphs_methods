@@ -44,7 +44,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="tab_3">
      <attribute name="title">
@@ -312,7 +312,7 @@
        </rect>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tab_4">
        <property name="enabled">
@@ -1217,7 +1217,7 @@
     </widget>
     <widget class="QWidget" name="tab_2">
      <attribute name="title">
-      <string>Грфический метод</string>
+      <string>Графический метод</string>
      </attribute>
      <widget class="QCustomPlot" name="main_graph" native="true">
       <property name="geometry">
@@ -1531,6 +1531,8 @@
     <property name="title">
      <string>Справка</string>
     </property>
+    <addaction name="referenceSimplex"/>
+    <addaction name="referenceGraph"/>
    </widget>
    <addaction name="menu"/>
    <addaction name="menu_2"/>
@@ -1543,6 +1545,16 @@
   <action name="load">
    <property name="text">
     <string>Загрузить</string>
+   </property>
+  </action>
+  <action name="referenceSimplex">
+   <property name="text">
+    <string>Симплекс метод</string>
+   </property>
+  </action>
+  <action name="referenceGraph">
+   <property name="text">
+    <string>Графический метод</string>
    </property>
   </action>
  </widget>
