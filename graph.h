@@ -19,14 +19,6 @@ public:
 
     const set<PointGraph> &getNice_points() const;
 
-    int getMaxX() const;
-
-    int getMaxY() const;
-
-    int getMinX() const;
-
-    int getMinY() const;
-
     bool getUp_restrictions() const;
 
     bool getRight_restrictions() const;
@@ -39,10 +31,7 @@ private:
     vector<vector<Fractions>> equations;
     set<PointGraph> nice_points;
     vector<pair<PointGraph, PointGraph>> main_points;
-    int maxX;
-    int maxY;
-    int minX;
-    int minY;
+
 
     bool up_restrictions = false;
     bool right_restrictions = false;

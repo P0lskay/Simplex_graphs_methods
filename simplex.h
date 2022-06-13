@@ -49,6 +49,9 @@ public:
     void start_main_matrix(vector<Fractions> task, Fractions free_k);
 
     void del_last_matrix();
+    void del_last_matrix_main();
+
+    size_t getFreeVarSize() const;
 };
 
 #endif // SIMPLEX_H

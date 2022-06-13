@@ -1,5 +1,4 @@
 #include "graph.h"
-#include <QDebug>
 Graph::Graph()
 {
 
@@ -9,9 +8,9 @@ Graph::Graph(vector<vector<int> > matrix, bool min_task, bool comon_fractions)
 {
     for(auto i : matrix)
     {
-        if(i[0] != 0 && i[1] == 0)
+        if(i[0] >= 0 && i[1] == 0)
             right_restrictions = true;
-        if(i[0] == 0 && i[1] != 0)
+        if(i[0] == 0 && i[1] >= 0)
             up_restrictions = true;
         if(i[0] > 0 && i[2] > 0)
             round_x_restrictions = true;
@@ -46,26 +45,6 @@ const vector<vector<Fractions> > &Graph::getRestrictions() const
 const set<PointGraph> &Graph::getNice_points() const
 {
     return nice_points;
-}
-
-int Graph::getMaxX() const
-{
-    return maxX;
-}
-
-int Graph::getMaxY() const
-{
-    return maxY;
-}
-
-int Graph::getMinX() const
-{
-    return minX;
-}
-
-int Graph::getMinY() const
-{
-    return minY;
 }
 
 bool Graph::getUp_restrictions() const
@@ -128,7 +107,7 @@ void Graph::generate_points()
         {
             PointGraph newPoint;
             if(i != j && ((Fractions(0) != equations[j][1] && Fractions(0) != equations[j][0] && !((equations[i][0]/equations[j][0]) ==  (equations[i][1]/equations[j][1]))) ||
-                    (((Fractions(0) != equations[j][0]) || (Fractions(0) == equations[j][0] && Fractions(0) != equations[i][0])) &&
+                    ((Fractions(0) == equations[j][1] || Fractions(0) == equations[j][0]) && ((Fractions(0) != equations[j][0]) || (Fractions(0) == equations[j][0] && Fractions(0) != equations[i][0])) &&
                           ((Fractions(0) != equations[j][1]) || (Fractions(0) == equations[j][1] && Fractions(0) != equations[i][1])))) &&
                     !(Fractions(0) == equations[i][0] && Fractions(0) == equations[i][1]) && !(Fractions(0) == equations[j][0] && Fractions(0) == equations[j][1]))
             {
@@ -191,25 +170,20 @@ void Graph::generate_points()
 
                     newPoint = PointGraph(x, y, equations[i], equations[j]);
                 }
-                 qDebug() << QString::fromStdString((string) newPoint.getX()) << " " << QString::fromStdString((string) newPoint.getY());
                 all_points.push_back(newPoint);
             }
 
         }
     }
 
-    qDebug() << all_points.size();
     //Нужно проверить, что точка удовлетворяет всем неравенствам
     for(auto point : all_points)
     {
         bool nice_point = true;
 
-        qDebug() << equations.size();
         for(auto equation : equations)
         {
 
-            //qDebug() << QString::fromStdString((string) equation[0]) << " " << QString::fromStdString((string) equation[1]) << " " << QString::fromStdString((string) equation[2]);
-            //qDebug() << QString::fromStdString((string) point.getX()) << " " << QString::fromStdString((string) point.getY());
             //Получаем сначала значение x и y затем складываем их со свободным членом
             //Если результат меньше 0, значит точка не удовлетворяет одному из неравенств
             Fractions x = point.getX() * equation[0];
@@ -230,28 +204,6 @@ void Graph::generate_points()
         if(nice_point)
         {
             nice_points.insert(point);
-            if(nice_points.size() == 1) //Если в векторе только одна точка, значит у нас может быть только 1 минимум и максимум
-            {
-                maxX = point.getX().getFraction().first /point.getX().getFraction().second;
-                minX = maxX;
-
-                maxY = point.getY().getFraction().first / point.getY().getFraction().second;
-                minY = maxY;
-            }
-            else
-            {
-                if(point.getX().getFraction().first / point.getX().getFraction().second > maxX)
-                    maxX = point.getX().getFraction().first / point.getX().getFraction().second;
-
-                if(point.getX().getFraction().first / point.getX().getFraction().second < minX)
-                    minX = point.getX().getFraction().first / point.getX().getFraction().second;
-
-                if(point.getY().getFraction().first / point.getY().getFraction().second > maxY)
-                    maxY = point.getY().getFraction().first / point.getY().getFraction().second;
-
-                if(point.getY().getFraction().first / point.getY().getFraction().second < minY)
-                    minY = point.getY().getFraction().first / point.getY().getFraction().second;
-            }
         }
     }
 

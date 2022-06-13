@@ -210,6 +210,12 @@ void Simplex::del_last_matrix()
     }
 }
 
+size_t Simplex::getFreeVarSize() const
+{
+    return free_var.size();
+}
+
+
 
 Simplex_matrix::Simplex_matrix(vector<vector<int>>& matrix, bool common_fractions)
 {

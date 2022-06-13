@@ -122,8 +122,10 @@ void MainWindow::on_btn_send_into_data_released()
 
     try
     {
+        if(restriction_num == 0 || variables_num == 0)
+            throw exception("Кол-во ограничений и переменных должно быть больше 0!");
         if(restriction_num >= variables_num)
-            throw invalid_argument("");
+            throw exception("Калькулятор умеет решать только задачи, где число ограничений меньше числа переменных!");
         if(ui->type_fractions->currentText() == "Десятичный")
             common_fractions = false;
         else
@@ -174,8 +176,6 @@ void MainWindow::on_btn_send_into_data_released()
         ui->btn_next_simplex_first->setEnabled(true);
         ui->pushButton->setEnabled(true);
 
-    } catch (invalid_argument ex) {
-        QMessageBox::warning(this, "Внимание","Калькулятор умеет решать только задачи, где число ограничений меньше числа переменных!");
     } catch (exception ex) {
         QMessageBox::warning(this, "Внимание", ex.what());
         on_btn_restart_simplex_released();
@@ -207,19 +207,25 @@ void MainWindow::on_btn_send_into_data_2_released()
 
         for(int i = 0; i < graph_restriction_num; i++)
         {
+            bool task_ok = false;
             graph_restrictions_matrix.push_back({});
             for(int j = 0; j < 3; j++)
             {
+                if(j < 2 && ui->table_restrictions_data_2->item(i, j)->text().toInt() != 0)
+                    task_ok = true;
                 if(!re.exactMatch(ui->table_restrictions_data_2->item(i, j)->text()))
-                    throw exception();
+                    throw exception("Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
                 graph_restrictions_matrix[i].push_back(ui->table_restrictions_data_2->item(i, j)->text().toInt());
             }
+            if(!task_ok)
+                throw exception("У вас не должно быть ограничений без ненулевых Xi!");
         }
         start_graph_method();
         ui->btn_send_into_data_2->setEnabled(false);
 
     }  catch (exception ex) {
-        QMessageBox::warning(this, "Внимание","Вы можете ввести только ЦЕЛЫЕ ЧИСЛА!!!");
+        QMessageBox::warning(this, "Внимание", ex.what());
+        on_btn_restart_graph_released();
     }
 }
 
@@ -352,23 +358,6 @@ void MainWindow::refrsh_main_task()
     }
 }
 
-void MainWindow::refresh_graph_main_task(vector<vector<Fractions>> current_matrix)
-{
-    for(int i = 0; i < current_matrix.size()-1; i++)
-    {
-        for(int j = 0; j < current_matrix[i].size()-1; j++)
-        {
-            //В главной задаче из j переменной вычитаем i переменную умноженную на коэффициент в уравнении i j
-            auto t = graph_main_task[i] * current_matrix[i][j];
-            graph_main_task[j] = graph_main_task[j] - t;
-        }
-        auto t = graph_main_task[i] * current_matrix[i][current_matrix[i].size()-1];
-        graph_main_task[graph_main_task.size()-1] = graph_main_task[graph_main_task.size()-1] + t;
-        graph_main_task[i] = Fractions(0);
-    }
-
-}
-
 void MainWindow::start_simplex()
 {
     simplex = *new Simplex(restrictions_matrix, true , common_fractions);
@@ -424,9 +413,9 @@ void MainWindow::start_graph_method()
 
 
         //Выводим линии графа и выделяем точки пересечения
-        ui->main_graph->xAxis->setRange(0, graph.getMaxX()+4);
+        ui->main_graph->xAxis->setRange(0, 20);
         ui->main_graph->xAxis->setLabel("X1");
-        ui->main_graph->yAxis->setRange(0, graph.getMaxY()+4);
+        ui->main_graph->yAxis->setRange(0, 20);
         ui->main_graph->yAxis->setLabel("X2");
         ui->main_graph->legend->setVisible(true);
         ui->main_graph->legend->setBrush(QBrush(QColor(255,255,255,230)));
@@ -701,6 +690,36 @@ void MainWindow::set_new_headers()
         }
 }
 
+void MainWindow::set_new_headers_main()
+{
+    //считаем заголовки с текущей матрицы, затем переведем их в числа и обновим вектора
+    current_matrix_column.clear();
+    current_matrix_row.clear();
+
+    auto current_matrix = simplex.getLast_matrix();
+    if(current_matrix.size() > 0)
+    {
+        for(int i = y+1, j = 0; j < current_matrix[0].size()-1; i++, j++)
+        {
+            QString header = ui->simplex_second_table->item(x1, i)->text();
+            header = header.right(header.size()-2);
+            header = header.left(header.size()-1);
+            int num = header.toInt();
+            current_matrix_row.push_back(num);
+        }
+    }
+
+
+        for(int i = x1 + 1, j = 0; j <current_matrix.size()-1; i++, j++)
+        {
+            QString header = ui->simplex_second_table->item(i, y1)->text();
+            header = header.right(header.size()-2);
+            header = header.left(header.size()-1);
+            int num = header.toInt();
+            current_matrix_column.push_back(num);
+        }
+}
+
 
 void MainWindow::on_btn_next_simplex_first_released()
 {
@@ -768,28 +787,35 @@ void MainWindow::on_btn_next_simplex_first_released()
 
     if(check_simplex_end())
     {
-        ui->btn_next_simplex_first->setEnabled(false);
-        refrsh_main_task();
-        string res_cout = "f* = ";
-        for (int i = 0; i < main_task.size()-1; i++)
+        if(simplex.getFreeVarSize() == 0)
         {
-            if(!(main_task[i] == 0))
+            ui->btn_next_simplex_first->setEnabled(false);
+            refrsh_main_task();
+            string res_cout = "f* = ";
+            for (int i = 0; i < main_task.size()-1; i++)
             {
-                if(res_cout.length() > 5)
+                if(!(main_task[i] == 0))
                 {
+                    if(res_cout.length() > 5)
+                    {
 
-                    res_cout += "+ (" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
+                        res_cout += "+ (" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
+                    }
+                    else
+                        res_cout += "(" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
                 }
-                else
-                    res_cout += "(" + string(main_task[i]) + ")X" + to_string(i+1) + " ";
             }
+             res_cout += "+ (" + string(main_task[main_task.size()-1]) + ")" ;
+            ui->cout_simplex_task_first->setText(QString::fromStdString(res_cout));
+
+            start_main_task();
+
         }
-         res_cout += "+ (" + string(main_task[main_task.size()-1]) + ")" ;
-        ui->cout_simplex_task_first->setText(QString::fromStdString(res_cout));
-
-        start_main_task();
-
-        qDebug() << "Off";
+        else
+        {
+            ui->btn_next_simplex_first->setEnabled(false);
+            ui->cout_simplex_task_first->setText(QString::fromStdString("Функция не ограничена. Решения нет!"));
+        }
     }
     else if(check_simplex_error())
     {
@@ -822,7 +848,7 @@ void MainWindow::on_btn_last_simplex_first_released()
 
     //Обновляем вектор с заголовками
     set_new_headers();
-    qDebug() << "OK";
+
     current_matrix = simplex.getLast_matrix();
 
     for(int i = 0; i < current_matrix.size() ; i++)
@@ -834,7 +860,7 @@ void MainWindow::on_btn_last_simplex_first_released()
             select_basis(i, j);
         }
     }
-    qDebug() << "OKOK";
+
     num_iter--;
 
     if(simplex.getSizeMatrixStack() == 1)
@@ -911,6 +937,71 @@ void MainWindow::on_btn_next_simplex_second_released()
         ui->btn_next_simplex_second->setEnabled(false);
 
     }
+}
+
+void MainWindow::on_btn_last_simplex_second_released()
+{
+    num_iter_main--;
+    if(num_iter_main == 0)
+    {
+        ui->cout_simplex_task_second->setText("");
+        ui->btn_next_simplex_second->setEnabled(false);
+        ui->btn_last_simplex_second->setEnabled(false);
+        ui->btn_last_simplex_first->setEnabled(true);
+
+        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+        for(int i = 0; i < current_matrix.size()+1 ; i++)
+        {
+            for(int j = 0; j < current_matrix[0].size()+1; j++)
+            {
+                //Заполняем матрицу
+                ui->simplex_second_table->setItem(i, j, new QTableWidgetItem(""));
+                ui->simplex_second_table->item(i, j)->setBackgroundColor(QColor(255, 255, 255));
+            }
+        }
+
+        simplex.del_last_matrix();
+        on_btn_last_simplex_first_released();
+    }
+    else
+    {
+        ui->cout_simplex_task_second->setText("");
+        ui->btn_next_simplex_second->setEnabled(true);
+
+        vector<vector<Fractions>> current_matrix = simplex.getLast_matrix();
+
+        for(int i = 0; i < current_matrix.size()+1 ; i++)
+        {
+            for(int j = 0; j < current_matrix[0].size()+1; j++)
+            {
+                //Заполняем матрицу
+                ui->simplex_second_table->setItem(i+ x1, j, new QTableWidgetItem(""));
+                ui->simplex_second_table->item(i+ x1, j)->setBackgroundColor(QColor(255, 255, 255));
+            }
+        }
+        simplex.del_last_matrix();
+
+        x1-= restriction_num + 3;
+
+        //Обновляем вектор с заголовками
+        set_new_headers_main();
+
+        current_matrix = simplex.getLast_matrix();
+
+        for(int i = 0; i < current_matrix.size() ; i++)
+        {
+            for(int j = 0; j < current_matrix[i].size(); j++)
+            {
+                ui->simplex_second_table->item(i+ x1 + 1, j+1)->setBackgroundColor(QColor(255, 255, 255));
+                //Выделяем все возможные базисы
+                select_basis_main(i, j);
+            }
+        }
+    }
+
+
+
 }
 
 
@@ -997,7 +1088,6 @@ void MainWindow::on_btn_restart_graph_released()
     ui->main_graph->clearGraphs();
     ui->main_graph->clearItems();
     ui->main_graph->clearPlottables();
-    ui->table_restrictions_data_2->clear();
     ui->table_restrictions_data_2->setRowCount(0);
     ui->restrictions_num_2->setValue(0);
     ui->cout_graph_task->clear();
@@ -1010,11 +1100,11 @@ void MainWindow::on_btn_restart_graph_released()
 
 void MainWindow::on_save_triggered()
 {
-    QString fileName = QFileDialog::getSaveFileName(this);
+    QString fileName = QFileDialog::getSaveFileName(this) + ".json";
         if (fileName.isEmpty()) {
             return;
         }
-        ModelStorage::save(fileName, ui->table_task_data, ui->table_restrictions_data);
+        ModelStorage::save(fileName, ui->table_task_data, ui->table_restrictions_data, ui->table_task_data_2, ui->table_restrictions_data_2);
 }
 
 
@@ -1024,7 +1114,8 @@ void MainWindow::on_load_triggered()
         if (fileName.isEmpty()) {
             return;
         }
-        ModelStorage::load(fileName, ui->table_task_data, ui->table_restrictions_data, ui->variables_num, ui->restrictions_num);
+        ModelStorage::load(fileName, ui->table_task_data, ui->table_restrictions_data, ui->variables_num, ui->restrictions_num, ui->table_task_data_2, ui->table_restrictions_data_2,
+                           ui->restrictions_num_2);
 }
 
 
@@ -1040,4 +1131,6 @@ void MainWindow::on_referenceGraph_triggered()
     referenceGraph *rg = new referenceGraph();
     rg->show();
 }
+
+
 

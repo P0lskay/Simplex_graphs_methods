@@ -67,6 +67,8 @@ private slots:
 
     void on_referenceGraph_triggered();
 
+    void on_btn_last_simplex_second_released();
+
 private:
 
     Simplex simplex= *new Simplex();
@@ -107,6 +109,7 @@ private:
     void select_basis_main(int row, int column);
     //Обновление векторов, которые хранят заголовки матриц
     void set_new_headers();
+    void set_new_headers_main();
     //Вывод заголовка текущей матрицы для вспомогательной задачи
     void cout_matrix_header_first_table() const;
     void cout_matrix_header_second_table() const;
@@ -118,7 +121,6 @@ private:
     bool check_simplex_error();
     //Метод обновляющий главную задачу после решения вспомогательной задачи
     void refrsh_main_task();
-    void refresh_graph_main_task(vector<vector<Fractions>> vec);
 
     void start_simplex();
 
